@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
-import { ArrowRight, Code2, Layers, Smartphone, ShoppingBag, Zap, Shield, Flame, Clock, Star, Quote } from "lucide-react";
+import { ArrowRight, Code2, Layers, Smartphone, ShoppingBag, Zap, Shield, Flame, Clock, Star, Quote, Globe, BookOpen, Store, Puzzle } from "lucide-react";
 import AnnouncementBar from "@/components/layout/AnnouncementBar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,10 @@ const CATEGORIES = [
   { label: "Admin Panels", slug: "admin-panels", icon: Shield, color: "text-green-400" },
   { label: "E-Commerce", slug: "ecommerce", icon: ShoppingBag, color: "text-pink-400" },
   { label: "Full-Stack Apps", slug: "fullstack", icon: Code2, color: "text-orange-400" },
+  { label: "WordPress Plugins", slug: "wordpress", icon: Globe, color: "text-blue-400" },
+  { label: "Blogger Templates", slug: "blogger", icon: BookOpen, color: "text-orange-300" },
+  { label: "Shopify Templates", slug: "shopify", icon: Store, color: "text-green-300" },
+  { label: "Browser Extensions", slug: "extensions", icon: Puzzle, color: "text-rose-400" },
 ];
 
 function SectionHeader({ title, icon: Icon, href, color }: { title: string; icon: React.ElementType; href: string; color?: string }) {

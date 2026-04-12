@@ -20,7 +20,7 @@ import { seedDemoProducts } from "@/lib/seedData";
 import { formatPrice } from "@/lib/stripe";
 import type { Product } from "@/types";
 
-const CATEGORIES = ["templates","saas","mobile","admin-panels","ecommerce","fullstack","other"];
+const CATEGORIES = ["templates","saas","mobile","admin-panels","ecommerce","fullstack","wordpress","blogger","shopify","extensions","other"];
 
 const emptyForm = {
   title: "", slug: "", shortDescription: "", description: "",

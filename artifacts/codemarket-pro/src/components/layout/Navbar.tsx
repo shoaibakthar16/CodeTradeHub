@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { ShoppingCart, Menu, X, User, LogOut, LayoutDashboard, Shield } from "lucide-react";
+import { ShoppingCart, Menu, X, User, LogOut, LayoutDashboard, Shield, ChevronDown, Info, HeadphonesIcon, FileText, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -14,11 +14,18 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 
+const moreLinks = [
+  { label: "About Us", href: "/about", icon: Info },
+  { label: "Support", href: "/support", icon: HeadphonesIcon },
+  { label: "Terms & Conditions", href: "/terms", icon: FileText },
+  { label: "Privacy Policy", href: "/privacy", icon: FileText },
+];
+
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, userProfile, isAdmin, logout } = useAuth();
   const { itemCount } = useCart();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
 
   const handleLogout = async () => {
     await logout();
@@ -29,12 +36,15 @@ export default function Navbar() {
     ? user.displayName.split(" ").map((n) => n[0]).join("").toUpperCase()
     : "U";
 
+  const navLinkClass = (href: string) =>
+    `text-sm transition-colors ${location === href ? "text-foreground font-medium" : "text-muted-foreground hover:text-foreground"}`;
+
   return (
     <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
+          <Link href="/" className="flex items-center gap-2 group shrink-0">
             <img src="/logo.png" alt="CodeTradeHub" className="w-8 h-8 rounded-lg object-cover" />
             <span className="font-bold text-lg tracking-tight">
               <span className="text-foreground">Code</span><span className="text-primary">TradeHub</span>
@@ -42,12 +52,35 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-6">
-            <Link href="/products" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <div className="hidden md:flex items-center gap-1">
+            <Link href="/" className={`px-3 py-2 rounded-md ${navLinkClass("/")}`}>
+              Home
+            </Link>
+            <Link href="/products" className={`px-3 py-2 rounded-md ${navLinkClass("/products")}`}>
               Products
             </Link>
+
+            {/* More dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-1 px-3 py-2 rounded-md text-sm text-muted-foreground hover:text-foreground transition-colors">
+                  More <ChevronDown className="w-3.5 h-3.5" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                {moreLinks.map(({ label, href, icon: Icon }) => (
+                  <DropdownMenuItem key={href} asChild>
+                    <Link href={href} className="flex items-center gap-2 cursor-pointer">
+                      <Icon className="w-4 h-4 text-muted-foreground" />
+                      {label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             {isAdmin && (
-              <Link href="/admin" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+              <Link href="/admin" className={`px-3 py-2 rounded-md ${navLinkClass("/admin")}`}>
                 Admin
               </Link>
             )}
@@ -126,17 +159,29 @@ export default function Navbar() {
         {/* Mobile Nav */}
         {mobileOpen && (
           <div className="md:hidden border-t border-border py-3 space-y-1">
-            <Link href="/products" className="block px-3 py-2 text-sm rounded hover:bg-muted transition-colors" onClick={() => setMobileOpen(false)}>
+            <Link href="/" className="flex items-center gap-2 px-3 py-2 text-sm rounded hover:bg-muted transition-colors" onClick={() => setMobileOpen(false)}>
+              <Home className="w-4 h-4" /> Home
+            </Link>
+            <Link href="/products" className="flex items-center gap-2 px-3 py-2 text-sm rounded hover:bg-muted transition-colors" onClick={() => setMobileOpen(false)}>
               Products
             </Link>
-            {user && (
-              <Link href="/dashboard" className="block px-3 py-2 text-sm rounded hover:bg-muted transition-colors" onClick={() => setMobileOpen(false)}>
-                Dashboard
+            <div className="h-px bg-border mx-3 my-1" />
+            {moreLinks.map(({ label, href, icon: Icon }) => (
+              <Link key={href} href={href} className="flex items-center gap-2 px-3 py-2 text-sm rounded hover:bg-muted transition-colors text-muted-foreground" onClick={() => setMobileOpen(false)}>
+                <Icon className="w-4 h-4" /> {label}
               </Link>
+            ))}
+            {user && (
+              <>
+                <div className="h-px bg-border mx-3 my-1" />
+                <Link href="/dashboard" className="flex items-center gap-2 px-3 py-2 text-sm rounded hover:bg-muted transition-colors" onClick={() => setMobileOpen(false)}>
+                  <LayoutDashboard className="w-4 h-4" /> Dashboard
+                </Link>
+              </>
             )}
             {isAdmin && (
-              <Link href="/admin" className="block px-3 py-2 text-sm rounded hover:bg-muted transition-colors" onClick={() => setMobileOpen(false)}>
-                Admin
+              <Link href="/admin" className="flex items-center gap-2 px-3 py-2 text-sm rounded hover:bg-muted transition-colors" onClick={() => setMobileOpen(false)}>
+                <Shield className="w-4 h-4" /> Admin
               </Link>
             )}
           </div>

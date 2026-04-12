@@ -26,7 +26,7 @@ const CATEGORIES = [
   { label: "Admin Panels", value: "admin-panels" },
   { label: "E-Commerce", value: "ecommerce" },
   { label: "Full-Stack", value: "fullstack" },
-  { label: "WordPress Plugins", value: "wordpress" },
+  { label: "WordPress Templates", value: "wordpress" },
   { label: "Blogger Templates", value: "blogger" },
   { label: "Shopify Templates", value: "shopify" },
   { label: "Browser Extensions", value: "extensions" },

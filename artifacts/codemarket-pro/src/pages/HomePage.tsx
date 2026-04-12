@@ -18,7 +18,7 @@ const CATEGORIES = [
   { label: "Admin Panels", slug: "admin-panels", icon: Shield, color: "text-green-400" },
   { label: "E-Commerce", slug: "ecommerce", icon: ShoppingBag, color: "text-pink-400" },
   { label: "Full-Stack Apps", slug: "fullstack", icon: Code2, color: "text-orange-400" },
-  { label: "WordPress Plugins", slug: "wordpress", icon: Globe, color: "text-blue-400" },
+  { label: "WordPress Templates", slug: "wordpress", icon: Globe, color: "text-blue-400" },
   { label: "Blogger Templates", slug: "blogger", icon: BookOpen, color: "text-orange-300" },
   { label: "Shopify Templates", slug: "shopify", icon: Store, color: "text-green-300" },
   { label: "Browser Extensions", slug: "extensions", icon: Puzzle, color: "text-rose-400" },

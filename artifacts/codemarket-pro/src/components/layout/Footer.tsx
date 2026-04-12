@@ -45,7 +45,7 @@ export default function Footer() {
                 { label: "SaaS Kits", href: "/products?category=saas" },
                 { label: "Mobile Apps", href: "/products?category=mobile" },
                 { label: "Full-Stack Apps", href: "/products?category=fullstack" },
-                { label: "WordPress Plugins", href: "/products?category=wordpress" },
+                { label: "WordPress Templates", href: "/products?category=wordpress" },
                 { label: "Blogger Templates", href: "/products?category=blogger" },
                 { label: "Shopify Templates", href: "/products?category=shopify" },
                 { label: "Browser Extensions", href: "/products?category=extensions" },

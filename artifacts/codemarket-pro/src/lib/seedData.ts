@@ -317,7 +317,7 @@ const DEMO_PRODUCTS = [
     fileName: "",
   },
 
-  // ─── WordPress Plugins ─────────────────────────────────────────────────────
+  // ─── WordPress Templates ───────────────────────────────────────────────────
   {
     title: "WP Mega Menu Plugin — Drag & Drop Builder",
     slug: "wp-mega-menu-plugin",

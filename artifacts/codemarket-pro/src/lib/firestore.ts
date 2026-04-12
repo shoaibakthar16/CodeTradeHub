@@ -39,31 +39,31 @@ export async function getProducts(params?: {
   limitCount?: number;
   publishedOnly?: boolean;
 }): Promise<Product[]> {
+  // Avoid composite index requirement by NOT using orderBy in Firestore queries.
+  // We fetch, then sort client-side.
   const publishedQuery = query(
     collection(db, "products"),
-    where("published", "==", true),
-    orderBy("createdAt", "desc")
+    where("published", "==", true)
   );
-  const allQuery = query(collection(db, "products"), orderBy("createdAt", "desc"));
+  const allQuery = query(collection(db, "products"));
 
-  let baseQuery = params?.publishedOnly !== false ? publishedQuery : allQuery;
-
-  if (params?.limitCount) {
-    baseQuery = query(baseQuery, limit(params.limitCount));
-  }
+  const baseQuery = params?.publishedOnly !== false ? publishedQuery : allQuery;
 
   let snapshot;
   try {
     snapshot = await getDocs(baseQuery);
   } catch {
     // Fall back to published-only query when Firestore rules block the full query
-    const fallback = params?.limitCount
-      ? query(publishedQuery, limit(params.limitCount))
-      : publishedQuery;
-    snapshot = await getDocs(fallback);
+    snapshot = await getDocs(publishedQuery);
   }
 
-  let products = snapshot.docs.map((d) => docToProduct(d.id, d.data() as Record<string, unknown>));
+  let products = snapshot.docs
+    .map((d) => docToProduct(d.id, d.data() as Record<string, unknown>))
+    .sort((a, b) => {
+      const dateA = a.createdAt instanceof Date ? a.createdAt : new Date(a.createdAt as string);
+      const dateB = b.createdAt instanceof Date ? b.createdAt : new Date(b.createdAt as string);
+      return dateB.getTime() - dateA.getTime();
+    });
 
   if (params?.category) {
     products = products.filter((p) => p.category === params.category);
@@ -77,6 +77,10 @@ export async function getProducts(params?: {
         p.description.toLowerCase().includes(s) ||
         p.tags?.some((t) => t.toLowerCase().includes(s))
     );
+  }
+
+  if (params?.limitCount) {
+    products = products.slice(0, params.limitCount);
   }
 
   return products;

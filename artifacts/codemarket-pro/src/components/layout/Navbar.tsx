@@ -210,15 +210,6 @@ export default function Navbar() {
           {/* Right side */}
           <div className="flex items-center gap-1.5">
 
-            {/* Browse CTA — desktop only */}
-            <Link
-              href="/products"
-              className="hidden lg:flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-primary/15 hover:bg-primary/25 text-primary hover:text-white border border-primary/25 hover:border-primary/50 transition-all duration-200 mr-1"
-            >
-              <Zap className="w-3.5 h-3.5" />
-              Browse
-            </Link>
-
             {/* Cart */}
             <Button
               variant="ghost"

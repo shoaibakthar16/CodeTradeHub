@@ -106,7 +106,7 @@ export default function Navbar() {
               onMouseLeave={() => setCatOpen(false)}
             >
               <button className="flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-white hover:bg-white/5 transition-all duration-200">
-                Categories <ChevronDown className={`w-3.5 h-3.5 mt-px transition-transform duration-200 ${catOpen ? "rotate-180" : ""}`} />
+                Templates <ChevronDown className={`w-3.5 h-3.5 mt-px transition-transform duration-200 ${catOpen ? "rotate-180" : ""}`} />
               </button>
               {catOpen && (
                 <div className="absolute top-full left-0 mt-1 w-52 rounded-lg border border-white/10 bg-[hsl(230_15%_10%)] shadow-2xl py-1 z-50">
@@ -278,7 +278,7 @@ export default function Navbar() {
               <Zap className="w-4 h-4" /> Products
             </Link>
             <div className="h-px bg-white/8 mx-1 my-1.5" />
-            <p className="px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">Categories</p>
+            <p className="px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">Templates</p>
             <Link href="/products?category=wordpress" className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-white/5 hover:text-white transition-colors" onClick={() => setMobileOpen(false)}>
               <Globe className="w-4 h-4 text-blue-400/80" /> WordPress Templates
             </Link>

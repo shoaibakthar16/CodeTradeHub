@@ -669,8 +669,12 @@ const DEMO_PRODUCTS = [
 export async function seedDemoProducts(): Promise<number> {
   let created = 0;
   for (const product of DEMO_PRODUCTS) {
-    await createProduct(product as Parameters<typeof createProduct>[0]);
-    created++;
+    try {
+      await createProduct(product as Parameters<typeof createProduct>[0]);
+      created++;
+    } catch {
+      // skip duplicates silently
+    }
   }
   return created;
 }

@@ -148,12 +148,10 @@ export default function AdminProducts() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold">Products</h1>
         <div className="flex gap-2">
-          {products.length === 0 && (
-            <Button size="sm" variant="outline" onClick={handleSeedData} disabled={seeding}>
-              <Sparkles className="w-4 h-4 mr-1.5" />
-              {seeding ? "Adding demo data…" : "Seed Demo Data"}
-            </Button>
-          )}
+          <Button size="sm" variant="outline" onClick={handleSeedData} disabled={seeding}>
+            <Sparkles className="w-4 h-4 mr-1.5" />
+            {seeding ? "Adding demo data…" : "Seed Demo Data"}
+          </Button>
           <Button size="sm" onClick={openCreate} data-testid="button-create-product">
             <Plus className="w-4 h-4 mr-1.5" /> New Product
           </Button>

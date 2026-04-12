@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
-import { ArrowRight, Code2, Layers, Smartphone, ShoppingBag, Zap, Shield } from "lucide-react";
+import { ArrowRight, Code2, Layers, Smartphone, ShoppingBag, Zap, Shield, Flame, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -9,25 +10,78 @@ import ProductCard from "@/components/store/ProductCard";
 import { getProducts } from "@/lib/firestore";
 import type { Product } from "@/types";
 
-const categories = [
-  { label: "Website Templates", slug: "templates", icon: Layers },
-  { label: "SaaS Starter Kits", slug: "saas", icon: Zap },
-  { label: "Mobile Apps", slug: "mobile", icon: Smartphone },
-  { label: "Admin Panels", slug: "admin-panels", icon: Shield },
-  { label: "E-Commerce", slug: "ecommerce", icon: ShoppingBag },
-  { label: "Full-Stack Apps", slug: "fullstack", icon: Code2 },
+const CATEGORIES = [
+  { label: "Website Templates", slug: "templates", icon: Layers, color: "text-violet-400" },
+  { label: "SaaS Starter Kits", slug: "saas", icon: Zap, color: "text-yellow-400" },
+  { label: "Mobile Apps", slug: "mobile", icon: Smartphone, color: "text-cyan-400" },
+  { label: "Admin Panels", slug: "admin-panels", icon: Shield, color: "text-green-400" },
+  { label: "E-Commerce", slug: "ecommerce", icon: ShoppingBag, color: "text-pink-400" },
+  { label: "Full-Stack Apps", slug: "fullstack", icon: Code2, color: "text-orange-400" },
 ];
 
+function SectionHeader({ title, icon: Icon, href, color }: { title: string; icon: React.ElementType; href: string; color?: string }) {
+  return (
+    <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center gap-2.5">
+        <div className={`p-1.5 rounded-md bg-white/5 ${color || "text-primary"}`}>
+          <Icon className="w-4 h-4" />
+        </div>
+        <h2 className="text-lg font-semibold">{title}</h2>
+      </div>
+      <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
+        <Link href={href}>
+          View all <ArrowRight className="ml-1 w-3.5 h-3.5" />
+        </Link>
+      </Button>
+    </div>
+  );
+}
+
+function ProductRow({ products, loading }: { products: Product[]; loading: boolean }) {
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className="rounded-xl border border-border overflow-hidden">
+            <Skeleton className="aspect-video w-full" />
+            <div className="p-4 space-y-2">
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-3 w-full" />
+              <Skeleton className="h-3 w-1/2" />
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+  if (products.length === 0) return null;
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {products.map((product) => (
+        <ProductCard key={product.id} product={product} />
+      ))}
+    </div>
+  );
+}
+
 export default function HomePage() {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getProducts({ publishedOnly: true, limitCount: 8 })
-      .then(setProducts)
+    getProducts({ publishedOnly: true })
+      .then(setAllProducts)
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  const latest = allProducts.slice(0, 8);
+  const byCategory = CATEGORIES.map((cat) => ({
+    ...cat,
+    products: allProducts.filter((p) => p.category === cat.slug).slice(0, 4),
+  })).filter((cat) => loading || cat.products.length > 0);
+
+  const hasAnyProducts = allProducts.length > 0;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -76,23 +130,34 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Categories */}
-      <section className="py-16 border-b border-border">
+      {/* Category Tiles */}
+      <section className="py-14 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-xl font-semibold mb-6">Browse by Category</h2>
+          <div className="flex items-center gap-2.5 mb-6">
+            <div className="p-1.5 rounded-md bg-white/5 text-primary">
+              <Layers className="w-4 h-4" />
+            </div>
+            <h2 className="text-lg font-semibold">Browse by Category</h2>
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-            {categories.map((cat) => {
+            {CATEGORIES.map((cat) => {
               const Icon = cat.icon;
+              const count = allProducts.filter((p) => p.category === cat.slug).length;
               return (
                 <Link key={cat.slug} href={`/products?category=${cat.slug}`}>
                   <div
-                    className="flex flex-col items-center gap-2 p-4 rounded-lg border border-border bg-card hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer group"
+                    className="flex flex-col items-center gap-2 p-4 rounded-xl border border-border bg-card hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer group"
                     data-testid={`link-category-${cat.slug}`}
                   >
-                    <Icon className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-colors" />
-                    <span className="text-xs text-center text-muted-foreground group-hover:text-foreground transition-colors font-medium">
+                    <Icon className={`w-6 h-6 ${cat.color} group-hover:scale-110 transition-transform`} />
+                    <span className="text-xs text-center text-muted-foreground group-hover:text-foreground transition-colors font-medium leading-tight">
                       {cat.label}
                     </span>
+                    {count > 0 && (
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
+                        {count}
+                      </Badge>
+                    )}
                   </div>
                 </Link>
               );
@@ -101,33 +166,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Featured Products */}
-      <section className="py-16">
+      {/* Latest Products */}
+      <section className="py-14 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-xl font-semibold">Latest Products</h2>
-            <Button variant="ghost" size="sm" asChild>
-              <Link href="/products">
-                View all <ArrowRight className="ml-1 w-3.5 h-3.5" />
-              </Link>
-            </Button>
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {Array.from({ length: 8 }).map((_, i) => (
-                <div key={i} className="rounded-lg border border-border overflow-hidden">
-                  <Skeleton className="aspect-video w-full" />
-                  <div className="p-4 space-y-2">
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-3 w-full" />
-                    <Skeleton className="h-3 w-1/2" />
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : products.length === 0 ? (
-            <div className="text-center py-24 border border-dashed border-border rounded-xl">
+          <SectionHeader title="Latest Products" icon={Clock} href="/products" />
+          {loading || hasAnyProducts ? (
+            <ProductRow products={latest} loading={loading} />
+          ) : (
+            <div className="text-center py-20 border border-dashed border-border rounded-xl">
               <Code2 className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
               <h3 className="text-base font-medium mb-2">No products yet</h3>
               <p className="text-sm text-muted-foreground mb-4">Admin can add products from the admin panel.</p>
@@ -135,22 +181,45 @@ export default function HomePage() {
                 <Link href="/admin/products">Go to Admin</Link>
               </Button>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
           )}
         </div>
       </section>
 
+      {/* Popular This Week */}
+      {(loading || hasAnyProducts) && (
+        <section className="py-14 border-b border-border bg-card/20">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <SectionHeader title="Most Popular" icon={Flame} href="/products" color="text-orange-400" />
+            <ProductRow
+              products={[...allProducts].sort((a, b) => (b.downloadCount || 0) - (a.downloadCount || 0)).slice(0, 4)}
+              loading={loading}
+            />
+          </div>
+        </section>
+      )}
+
+      {/* Per-Category Sections */}
+      {byCategory.map((cat, idx) => (
+        <section
+          key={cat.slug}
+          className={`py-14 border-b border-border ${idx % 2 === 0 ? "" : "bg-card/20"}`}
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <SectionHeader
+              title={cat.label}
+              icon={cat.icon}
+              href={`/products?category=${cat.slug}`}
+              color={cat.color}
+            />
+            <ProductRow products={cat.products} loading={loading} />
+          </div>
+        </section>
+      ))}
+
       {/* CTA */}
-      <section className="py-20 border-t border-border bg-card/30">
+      <section className="py-20 border-t border-border bg-gradient-to-br from-primary/5 via-transparent to-accent/5">
         <div className="max-w-2xl mx-auto px-4 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">
-            Ready to build faster?
-          </h2>
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to build faster?</h2>
           <p className="text-muted-foreground mb-8">
             Join thousands of developers who save weeks of work by buying production-ready source code from CodeTradeHub.
           </p>

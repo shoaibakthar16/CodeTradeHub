@@ -309,24 +309,12 @@ export default function ProductDetailPage() {
                   </Button>
                 )}
 
-                <Button
-                  variant="outline"
-                  className="w-full gap-2 border-green-500/30 hover:bg-green-500/10 hover:text-green-400"
-                  asChild
-                  data-testid="button-whatsapp"
-                >
-                  <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-                    <MessageCircle className="w-4 h-4" />
-                    Buy via WhatsApp
-                  </a>
-                </Button>
-
                 {paypalBuyNowUrl && (
                   <a
                     href={paypalBuyNowUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-2 w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all bg-[#FFC439] hover:bg-[#f0b429] text-[#003087] border border-[#FFC439] hover:shadow-md"
+                    className="mb-2 w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all bg-[#FFC439] hover:bg-[#f0b429] text-[#003087] border border-[#FFC439] hover:shadow-md"
                     data-testid="button-paypal"
                   >
                     <svg className="w-14 h-auto" viewBox="0 0 101 32" xmlns="http://www.w3.org/2000/svg">
@@ -340,6 +328,18 @@ export default function ProductDetailPage() {
                     <span>Buy Now</span>
                   </a>
                 )}
+
+                <Button
+                  variant="outline"
+                  className="w-full gap-2 border-green-500/30 hover:bg-green-500/10 hover:text-green-400"
+                  asChild
+                  data-testid="button-whatsapp"
+                >
+                  <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+                    <MessageCircle className="w-4 h-4" />
+                    Buy via WhatsApp
+                  </a>
+                </Button>
 
                 <div className="mt-4 space-y-2">
                   {product.demoUrl && (

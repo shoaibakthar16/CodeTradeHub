@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Eye, EyeOff, Package, Sparkles, Star } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, Package, Sparkles, Star, ImagePlus, X, GripVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -39,6 +39,7 @@ export default function AdminProducts() {
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
   const [seeding, setSeeding] = useState(false);
+  const [newImageUrl, setNewImageUrl] = useState("");
 
   const load = () => {
     setLoading(true);
@@ -59,7 +60,18 @@ export default function AdminProducts() {
     }
   };
 
-  const openCreate = () => { setEditing(null); setForm(emptyForm); setOpen(true); };
+  const addPreviewImage = () => {
+    const url = newImageUrl.trim();
+    if (!url) return;
+    setForm((f) => ({ ...f, previewImages: [...f.previewImages, url] }));
+    setNewImageUrl("");
+  };
+
+  const removePreviewImage = (idx: number) => {
+    setForm((f) => ({ ...f, previewImages: f.previewImages.filter((_, i) => i !== idx) }));
+  };
+
+  const openCreate = () => { setEditing(null); setForm(emptyForm); setNewImageUrl(""); setOpen(true); };
   const openEdit = (p: Product) => {
     setEditing(p);
     setForm({
@@ -74,6 +86,7 @@ export default function AdminProducts() {
       fileUrl: p.fileUrl || "", fileName: p.fileName || "",
       featured: p.featured || false,
     });
+    setNewImageUrl("");
     setOpen(true);
   };
 
@@ -319,7 +332,72 @@ export default function AdminProducts() {
             <div>
               <Label className="text-xs">Thumbnail URL</Label>
               <Input value={form.thumbnail} onChange={(e)=>setForm({...form,thumbnail:e.target.value})} className="mt-1" placeholder="https://..." />
+              {form.thumbnail && (
+                <img src={form.thumbnail} alt="thumbnail" className="mt-2 w-full h-24 object-cover rounded-lg border border-border" onError={(e)=>(e.currentTarget.style.display="none")} />
+              )}
             </div>
+
+            {/* ── Demo / Preview Images ── */}
+            <div className="sm:col-span-2">
+              <Label className="text-xs flex items-center gap-1.5 mb-2">
+                <ImagePlus className="w-3.5 h-3.5 text-primary" />
+                Demo Screenshots ({form.previewImages.length} image{form.previewImages.length !== 1 ? "s" : ""})
+              </Label>
+
+              {/* Add new image */}
+              <div className="flex gap-2 mb-3">
+                <Input
+                  value={newImageUrl}
+                  onChange={(e) => setNewImageUrl(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addPreviewImage())}
+                  placeholder="https://i.imgur.com/... or any image URL"
+                  className="text-xs font-mono"
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={addPreviewImage}
+                  disabled={!newImageUrl.trim()}
+                  className="shrink-0"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1" /> Add
+                </Button>
+              </div>
+
+              {/* Preview grid */}
+              {form.previewImages.length > 0 ? (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                  {form.previewImages.map((url, idx) => (
+                    <div key={idx} className="relative group rounded-lg overflow-hidden border border-border aspect-video bg-muted">
+                      <img
+                        src={url}
+                        alt={`Preview ${idx + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => { e.currentTarget.style.display = "none"; }}
+                      />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+                        <span className="text-xs font-medium text-white">#{idx + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => removePreviewImage(idx)}
+                          className="w-6 h-6 rounded-full bg-destructive/90 flex items-center justify-center hover:bg-destructive transition-colors"
+                        >
+                          <X className="w-3 h-3 text-white" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-6 rounded-lg border border-dashed border-border text-center">
+                  <ImagePlus className="w-8 h-8 text-muted-foreground/30 mb-2" />
+                  <p className="text-xs text-muted-foreground">No demo images yet</p>
+                  <p className="text-[11px] text-muted-foreground/60 mt-0.5">Add image URLs above to showcase your product</p>
+                </div>
+              )}
+            </div>
+
             <div className="sm:col-span-2">
               <Label className="text-xs">Short Description</Label>
               <Input value={form.shortDescription} onChange={(e)=>setForm({...form,shortDescription:e.target.value})} className="mt-1" />

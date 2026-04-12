@@ -18,6 +18,7 @@ export interface Product {
   fileUrl?: string;
   fileName?: string;
   published: boolean;
+  featured?: boolean;
   downloadCount: number;
   createdAt: Date | string;
   updatedAt: Date | string;

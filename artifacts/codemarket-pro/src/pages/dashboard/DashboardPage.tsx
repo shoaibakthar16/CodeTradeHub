@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Download, Package, ShoppingBag, User, ExternalLink, AlertTriangle } from "lucide-react";
+import { Download, Package, ShoppingBag, User, ExternalLink, AlertTriangle, Heart } from "lucide-react";
+import { useWishlist } from "@/contexts/WishlistContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -13,6 +14,7 @@ import type { Product } from "@/types";
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const { count: wishlistCount } = useWishlist();
   const [, setLocation] = useLocation();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -83,6 +85,9 @@ service cloud.firestore {
             </Button>
             <Button variant="outline" size="sm" asChild>
               <Link href="/dashboard/downloads"><Download className="w-4 h-4 mr-1.5" />Downloads</Link>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/dashboard/wishlist"><Heart className="w-4 h-4 mr-1.5 text-rose-400" />Wishlist {wishlistCount > 0 && <span className="ml-1 text-xs bg-rose-500 text-white rounded-full px-1.5 py-0.5">{wishlistCount}</span>}</Link>
             </Button>
           </div>
         </div>

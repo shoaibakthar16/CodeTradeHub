@@ -4,6 +4,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "./contexts/AuthContext";
 import { CartProvider } from "./contexts/CartContext";
+import { WishlistProvider } from "./contexts/WishlistContext";
 import NotFound from "@/pages/not-found";
 
 // Pages
@@ -17,6 +18,7 @@ import LoginPage from "@/pages/LoginPage";
 import DashboardPage from "@/pages/dashboard/DashboardPage";
 import DashboardDownloads from "@/pages/dashboard/DashboardDownloads";
 import DashboardOrders from "@/pages/dashboard/DashboardOrders";
+import WishlistPage from "@/pages/dashboard/WishlistPage";
 import AdminPage from "@/pages/admin/AdminPage";
 import AdminProducts from "@/pages/admin/AdminProducts";
 import AdminOrders from "@/pages/admin/AdminOrders";
@@ -44,6 +46,7 @@ function Router() {
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/dashboard/downloads" component={DashboardDownloads} />
       <Route path="/dashboard/orders" component={DashboardOrders} />
+      <Route path="/dashboard/wishlist" component={WishlistPage} />
       <Route path="/admin" component={AdminPage} />
       <Route path="/admin/products" component={AdminProducts} />
       <Route path="/admin/orders" component={AdminOrders} />
@@ -65,12 +68,14 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <CartProvider>
+          <WishlistProvider>
           <TooltipProvider>
             <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
               <Router />
             </WouterRouter>
             <Toaster />
           </TooltipProvider>
+          </WishlistProvider>
         </CartProvider>
       </AuthProvider>
     </QueryClientProvider>

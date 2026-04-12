@@ -27,7 +27,7 @@ const emptyForm = {
   price: 0, originalPrice: undefined as number | undefined,
   category: "templates", version: "1.0.0", techStack: "",
   features: "", tags: "", thumbnail: "", demoUrl: "", docsUrl: "",
-  published: false, downloadCount: 0, previewImages: [], fileUrl: "", fileName: ""
+  published: false, featured: false, downloadCount: 0, previewImages: [], fileUrl: "", fileName: ""
 };
 
 export default function AdminProducts() {
@@ -71,7 +71,8 @@ export default function AdminProducts() {
       thumbnail: p.thumbnail || "", demoUrl: p.demoUrl || "",
       docsUrl: p.docsUrl || "", published: p.published,
       downloadCount: p.downloadCount || 0, previewImages: p.previewImages || [],
-      fileUrl: p.fileUrl || "", fileName: p.fileName || ""
+      fileUrl: p.fileUrl || "", fileName: p.fileName || "",
+      featured: p.featured || false,
     });
     setOpen(true);
   };
@@ -102,6 +103,7 @@ export default function AdminProducts() {
         fileUrl: form.fileUrl || undefined,
         fileName: form.fileName || undefined,
         published: form.published,
+        featured: form.featured,
         downloadCount: form.downloadCount,
       };
       if (editing) {
@@ -133,6 +135,11 @@ export default function AdminProducts() {
 
   const togglePublish = async (p: Product) => {
     await updateProduct(p.id, { published: !p.published });
+    load();
+  };
+
+  const toggleFeatured = async (p: Product) => {
+    await updateProduct(p.id, { featured: !p.featured });
     load();
   };
 
@@ -176,6 +183,7 @@ export default function AdminProducts() {
                 <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Category</th>
                 <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Price</th>
                 <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Status</th>
+                <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Featured</th>
                 <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Actions</th>
               </tr>
             </thead>
@@ -198,6 +206,14 @@ export default function AdminProducts() {
                       {p.published
                         ? <Badge className="text-xs bg-green-500/10 text-green-400 border-green-500/20"><Eye className="w-3 h-3 mr-1"/>Published</Badge>
                         : <Badge variant="outline" className="text-xs text-muted-foreground"><EyeOff className="w-3 h-3 mr-1"/>Draft</Badge>
+                      }
+                    </button>
+                  </td>
+                  <td className="px-4 py-3">
+                    <button onClick={() => toggleFeatured(p)}>
+                      {p.featured
+                        ? <Badge className="text-xs bg-amber-500/10 text-amber-400 border-amber-500/20">⭐ Featured</Badge>
+                        : <Badge variant="outline" className="text-xs text-muted-foreground">—</Badge>
                       }
                     </button>
                   </td>
@@ -294,6 +310,10 @@ export default function AdminProducts() {
             <div className="col-span-2 flex items-center gap-2">
               <Switch checked={form.published} onCheckedChange={(v)=>setForm({...form,published:v})} id="published" />
               <Label htmlFor="published" className="text-xs cursor-pointer">Published (visible to buyers)</Label>
+            </div>
+            <div className="col-span-2 flex items-center gap-2">
+              <Switch checked={form.featured} onCheckedChange={(v)=>setForm({...form,featured:v})} id="featured" />
+              <Label htmlFor="featured" className="text-xs cursor-pointer">⭐ Featured (highlighted with badge)</Label>
             </div>
           </div>
           <DialogFooter>

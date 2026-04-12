@@ -39,6 +39,8 @@ export default function ProductsPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState(searchParams.get("category") || "all");
   const [sort, setSort] = useState("newest");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
 
   useEffect(() => {
     getProducts({ publishedOnly: true })
@@ -55,11 +57,15 @@ export default function ProductsPage() {
         p.title.toLowerCase().includes(search.toLowerCase()) ||
         p.description.toLowerCase().includes(search.toLowerCase()) ||
         p.tags?.some((t) => t.toLowerCase().includes(search.toLowerCase()));
-      return matchCat && matchSearch;
+      const matchMin = !minPrice || p.price >= Number(minPrice);
+      const matchMax = !maxPrice || p.price <= Number(maxPrice);
+      return matchCat && matchSearch && matchMin && matchMax;
     })
     .sort((a, b) => {
       if (sort === "price-asc") return a.price - b.price;
       if (sort === "price-desc") return b.price - a.price;
+      if (sort === "popular") return (b.downloadCount || 0) - (a.downloadCount || 0);
+      if (sort === "featured") return (b.featured ? 1 : 0) - (a.featured ? 1 : 0);
       return 0;
     });
 
@@ -96,10 +102,42 @@ export default function ProductsPage() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="newest">Newest</SelectItem>
+                <SelectItem value="popular">Most Popular</SelectItem>
+                <SelectItem value="featured">Featured First</SelectItem>
                 <SelectItem value="price-asc">Price: Low to High</SelectItem>
                 <SelectItem value="price-desc">Price: High to Low</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Price range filter */}
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-xs text-muted-foreground shrink-0">Price:</span>
+            <Input
+              type="number"
+              placeholder="Min $"
+              className="w-24 h-8 text-xs"
+              value={minPrice}
+              onChange={(e) => setMinPrice(e.target.value)}
+              min={0}
+            />
+            <span className="text-xs text-muted-foreground">–</span>
+            <Input
+              type="number"
+              placeholder="Max $"
+              className="w-24 h-8 text-xs"
+              value={maxPrice}
+              onChange={(e) => setMaxPrice(e.target.value)}
+              min={0}
+            />
+            {(minPrice || maxPrice) && (
+              <button
+                onClick={() => { setMinPrice(""); setMaxPrice(""); }}
+                className="text-xs text-muted-foreground hover:text-foreground underline"
+              >
+                Clear
+              </button>
+            )}
           </div>
 
           {/* Category pills */}
@@ -139,7 +177,7 @@ export default function ProductsPage() {
               <Package className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
               <h3 className="text-base font-medium mb-2">No products found</h3>
               <p className="text-sm text-muted-foreground mb-4">Try adjusting your search or filters.</p>
-              <Button variant="outline" onClick={() => { setSearch(""); setCategory("all"); }}>
+              <Button variant="outline" onClick={() => { setSearch(""); setCategory("all"); setMinPrice(""); setMaxPrice(""); }}>
                 Clear filters
               </Button>
             </div>

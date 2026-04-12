@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "wouter";
-import { ArrowRight, Code2, Layers, Smartphone, ShoppingBag, Zap, Shield, Flame, Clock } from "lucide-react";
+import { ArrowRight, Code2, Layers, Smartphone, ShoppingBag, Zap, Shield, Flame, Clock, Star, Quote } from "lucide-react";
+import AnnouncementBar from "@/components/layout/AnnouncementBar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -83,8 +84,11 @@ export default function HomePage() {
 
   const hasAnyProducts = allProducts.length > 0;
 
+  const featured = allProducts.filter((p) => p.featured).slice(0, 4);
+
   return (
     <div className="min-h-screen flex flex-col">
+      <AnnouncementBar />
       <Navbar />
 
       {/* Hero */}
@@ -215,6 +219,47 @@ export default function HomePage() {
           </div>
         </section>
       ))}
+
+      {/* Featured Products */}
+      {(loading || featured.length > 0) && (
+        <section className="py-14 border-b border-border">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <SectionHeader title="Featured Products" icon={Star} href="/products" color="text-amber-400" />
+            <ProductRow products={featured} loading={loading} />
+          </div>
+        </section>
+      )}
+
+      {/* Testimonials */}
+      <section className="py-16 border-b border-border bg-card/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-xl font-bold mb-2">Loved by Developers</h2>
+            <p className="text-sm text-muted-foreground">See what builders are saying about CodeTradeHub</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              { name: "Ahmad R.", role: "Full-Stack Developer", text: "Saved me 3 weeks of work. The SaaS kit had everything — auth, payments, admin panel — all production-ready.", stars: 5 },
+              { name: "Priya M.", role: "Indie Hacker", text: "I launched my SaaS in 4 days using a template from CodeTradeHub. The code quality is seriously impressive.", stars: 5 },
+              { name: "James T.", role: "Freelance Dev", text: "My clients love the polished UIs. I deliver projects in half the time now. Best investment I've made this year.", stars: 5 },
+            ].map((t) => (
+              <div key={t.name} className="p-5 rounded-xl border border-border bg-card">
+                <Quote className="w-6 h-6 text-primary/30 mb-3" />
+                <p className="text-sm text-muted-foreground leading-relaxed mb-4">"{t.text}"</p>
+                <div className="flex items-center gap-1 mb-3">
+                  {Array.from({ length: t.stars }).map((_, i) => (
+                    <Star key={i} className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
+                  ))}
+                </div>
+                <div>
+                  <div className="font-medium text-sm">{t.name}</div>
+                  <div className="text-xs text-muted-foreground">{t.role}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* CTA */}
       <section className="py-20 border-t border-border bg-gradient-to-br from-primary/5 via-transparent to-accent/5">

@@ -39,17 +39,30 @@ export async function getProducts(params?: {
   limitCount?: number;
   publishedOnly?: boolean;
 }): Promise<Product[]> {
-  let q = query(collection(db, "products"), orderBy("createdAt", "desc"));
+  const publishedQuery = query(
+    collection(db, "products"),
+    where("published", "==", true),
+    orderBy("createdAt", "desc")
+  );
+  const allQuery = query(collection(db, "products"), orderBy("createdAt", "desc"));
 
-  if (params?.publishedOnly !== false) {
-    q = query(collection(db, "products"), where("published", "==", true), orderBy("createdAt", "desc"));
-  }
+  let baseQuery = params?.publishedOnly !== false ? publishedQuery : allQuery;
 
   if (params?.limitCount) {
-    q = query(q, limit(params.limitCount));
+    baseQuery = query(baseQuery, limit(params.limitCount));
   }
 
-  const snapshot = await getDocs(q);
+  let snapshot;
+  try {
+    snapshot = await getDocs(baseQuery);
+  } catch {
+    // Fall back to published-only query when Firestore rules block the full query
+    const fallback = params?.limitCount
+      ? query(publishedQuery, limit(params.limitCount))
+      : publishedQuery;
+    snapshot = await getDocs(fallback);
+  }
+
   let products = snapshot.docs.map((d) => docToProduct(d.id, d.data() as Record<string, unknown>));
 
   if (params?.category) {

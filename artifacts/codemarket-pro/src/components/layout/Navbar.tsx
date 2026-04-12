@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import {
   ShoppingCart, Menu, X, User, LogOut, LayoutDashboard, Shield,
-  ChevronDown, Home, Zap
+  ChevronDown, Home, Zap, Globe, ShoppingBag, BookOpen
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -97,6 +97,32 @@ export default function Navbar() {
                 )}
               </Link>
             ))}
+
+            {/* Categories dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-white hover:bg-white/5 transition-all duration-200">
+                  Categories <ChevronDown className="w-3.5 h-3.5 mt-px" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-52 bg-[hsl(230_15%_10%)] border-white/10 shadow-2xl">
+                <DropdownMenuItem asChild>
+                  <Link href="/products?category=wordpress" className="flex items-center gap-2.5 cursor-pointer text-muted-foreground hover:text-white">
+                    <Globe className="w-4 h-4 text-blue-400/80" /> WordPress Templates
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/products?category=shopify" className="flex items-center gap-2.5 cursor-pointer text-muted-foreground hover:text-white">
+                    <ShoppingBag className="w-4 h-4 text-green-400/80" /> Shopify Templates
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link href="/products?category=blogger" className="flex items-center gap-2.5 cursor-pointer text-muted-foreground hover:text-white">
+                    <BookOpen className="w-4 h-4 text-orange-400/80" /> Blogger Templates
+                  </Link>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {isAdmin && (
               <Link
@@ -239,6 +265,17 @@ export default function Navbar() {
               onClick={() => setMobileOpen(false)}
             >
               <Zap className="w-4 h-4" /> Products
+            </Link>
+            <div className="h-px bg-white/8 mx-1 my-1.5" />
+            <p className="px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">Categories</p>
+            <Link href="/products?category=wordpress" className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-white/5 hover:text-white transition-colors" onClick={() => setMobileOpen(false)}>
+              <Globe className="w-4 h-4 text-blue-400/80" /> WordPress Templates
+            </Link>
+            <Link href="/products?category=shopify" className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-white/5 hover:text-white transition-colors" onClick={() => setMobileOpen(false)}>
+              <ShoppingBag className="w-4 h-4 text-green-400/80" /> Shopify Templates
+            </Link>
+            <Link href="/products?category=blogger" className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-white/5 hover:text-white transition-colors" onClick={() => setMobileOpen(false)}>
+              <BookOpen className="w-4 h-4 text-orange-400/80" /> Blogger Templates
             </Link>
             {user && (
               <>

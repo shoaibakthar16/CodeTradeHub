@@ -24,6 +24,8 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
+const ADMIN_EMAILS = ["shoaibakthar1632@gmail.com"];
+
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -52,12 +54,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const syncProfile = async (firebaseUser: User, extra?: { displayName?: string }) => {
     try {
+      const isAdminEmail = ADMIN_EMAILS.includes((firebaseUser.email || "").toLowerCase());
       await createOrUpdateUserProfile({
         uid: firebaseUser.uid,
         email: firebaseUser.email!,
         displayName: extra?.displayName || firebaseUser.displayName || "User",
         photoURL: firebaseUser.photoURL || undefined,
-        role: "user",
+        role: isAdminEmail ? "admin" : "user",
       });
       const profile = await getUserProfile(firebaseUser.uid);
       setUserProfile(profile);
@@ -89,7 +92,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUserProfile(null);
   };
 
-  const isAdmin = userProfile?.role === "admin";
+  const isAdmin =
+    userProfile?.role === "admin" ||
+    ADMIN_EMAILS.includes((user?.email || "").toLowerCase());
 
   return (
     <AuthContext.Provider

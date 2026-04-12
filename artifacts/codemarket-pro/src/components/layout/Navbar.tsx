@@ -192,7 +192,7 @@ export default function Navbar() {
                     className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-xl hover:bg-white/6 border border-transparent hover:border-white/10 transition-all duration-200"
                     data-testid="button-user-menu"
                   >
-                    <Avatar className="w-7 h-7 ring-2 ring-primary/40">
+                    <Avatar className="w-7 h-7">
                       <AvatarImage src={user.photoURL || undefined} />
                       <AvatarFallback className="bg-gradient-to-br from-primary to-cyan-500 text-white text-xs font-bold">
                         {initials}

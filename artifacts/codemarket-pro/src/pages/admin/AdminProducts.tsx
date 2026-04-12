@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Eye, EyeOff, Package } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, Package, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -16,6 +16,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import AdminLayout from "@/components/layout/AdminLayout";
 import { getProducts, createProduct, updateProduct, deleteProduct } from "@/lib/firestore";
+import { seedDemoProducts } from "@/lib/seedData";
 import { formatPrice } from "@/lib/stripe";
 import type { Product } from "@/types";
 
@@ -37,12 +38,26 @@ export default function AdminProducts() {
   const [editing, setEditing] = useState<Product | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+  const [seeding, setSeeding] = useState(false);
 
   const load = () => {
     setLoading(true);
     getProducts({ publishedOnly: false }).then(setProducts).catch(() => {}).finally(() => setLoading(false));
   };
   useEffect(load, []);
+
+  const handleSeedData = async () => {
+    setSeeding(true);
+    try {
+      const count = await seedDemoProducts();
+      toast({ title: `${count} demo products added!`, description: "Reload to see them in the store." });
+      load();
+    } catch {
+      toast({ title: "Seed failed", description: "Check Firestore rules and try again.", variant: "destructive" });
+    } finally {
+      setSeeding(false);
+    }
+  };
 
   const openCreate = () => { setEditing(null); setForm(emptyForm); setOpen(true); };
   const openEdit = (p: Product) => {
@@ -125,9 +140,17 @@ export default function AdminProducts() {
     <AdminLayout>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-bold">Products</h1>
-        <Button size="sm" onClick={openCreate} data-testid="button-create-product">
-          <Plus className="w-4 h-4 mr-1.5" /> New Product
-        </Button>
+        <div className="flex gap-2">
+          {products.length === 0 && (
+            <Button size="sm" variant="outline" onClick={handleSeedData} disabled={seeding}>
+              <Sparkles className="w-4 h-4 mr-1.5" />
+              {seeding ? "Adding demo data…" : "Seed Demo Data"}
+            </Button>
+          )}
+          <Button size="sm" onClick={openCreate} data-testid="button-create-product">
+            <Plus className="w-4 h-4 mr-1.5" /> New Product
+          </Button>
+        </div>
       </div>
 
       {loading ? (
@@ -136,7 +159,13 @@ export default function AdminProducts() {
         <div className="text-center py-16 border border-dashed border-border rounded-xl">
           <Package className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
           <p className="text-sm text-muted-foreground mb-3">No products yet</p>
-          <Button size="sm" onClick={openCreate}>Create First Product</Button>
+          <div className="flex gap-2 justify-center">
+            <Button size="sm" variant="outline" onClick={handleSeedData} disabled={seeding}>
+              <Sparkles className="w-4 h-4 mr-1.5" />
+              {seeding ? "Adding…" : "Seed Demo Data"}
+            </Button>
+            <Button size="sm" onClick={openCreate}>Create First Product</Button>
+          </div>
         </div>
       ) : (
         <div className="rounded-lg border border-border overflow-hidden">

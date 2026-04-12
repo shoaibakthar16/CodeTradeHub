@@ -91,7 +91,9 @@ export default function LoginPage() {
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 bg-gradient-to-br from-primary/20 to-accent/10 border-r border-border">
         <Link href="/" className="flex items-center gap-2">
           <img src="/logo.png" alt="CodeTradeHub" className="w-8 h-8 rounded-lg object-cover" />
-          <span className="font-bold tracking-tight">CodeTradeHub</span>
+          <span className="font-bold tracking-tight">
+            <span className="text-foreground">Code</span><span className="text-blue-500">TradeHub</span>
+          </span>
         </Link>
         <div>
           <blockquote className="text-2xl font-medium leading-relaxed mb-6">
@@ -100,7 +102,9 @@ export default function LoginPage() {
           <div className="flex items-center gap-3">
             <img src="/logo.png" alt="CodeTradeHub" className="w-10 h-10 rounded-xl object-cover" />
             <div>
-              <div className="text-sm font-medium">CodeTradeHub</div>
+              <div className="text-sm font-medium">
+                <span className="text-foreground">Code</span><span className="text-blue-500">TradeHub</span>
+              </div>
               <div className="text-xs text-muted-foreground">Premium Source Code Marketplace</div>
             </div>
           </div>
@@ -116,7 +120,9 @@ export default function LoginPage() {
           <div className="lg:hidden mb-8">
             <Link href="/" className="flex items-center gap-2">
               <img src="/logo.png" alt="CodeTradeHub" className="w-7 h-7 rounded-lg object-cover" />
-              <span className="font-bold">CodeTradeHub</span>
+              <span className="font-bold">
+                <span className="text-foreground">Code</span><span className="text-blue-500">TradeHub</span>
+              </span>
             </Link>
           </div>
 

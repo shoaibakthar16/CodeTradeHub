@@ -36,7 +36,9 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
             <img src="/logo.png" alt="CodeTradeHub" className="w-8 h-8 rounded-lg object-cover" />
-            <span className="font-bold text-lg tracking-tight">CodeTradeHub</span>
+            <span className="font-bold text-lg tracking-tight">
+              <span className="text-foreground">Code</span><span className="text-blue-500">TradeHub</span>
+            </span>
           </Link>
 
           {/* Desktop Nav */}

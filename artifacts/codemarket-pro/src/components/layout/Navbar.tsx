@@ -21,6 +21,7 @@ import { useCart } from "@/contexts/CartContext";
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [catOpen, setCatOpen] = useState(false);
   const { user, isAdmin, logout } = useAuth();
   const { itemCount } = useCart();
   const [location, setLocation] = useLocation();
@@ -98,31 +99,41 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* Categories dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-white hover:bg-white/5 transition-all duration-200">
-                  Categories <ChevronDown className="w-3.5 h-3.5 mt-px" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="w-52 bg-[hsl(230_15%_10%)] border-white/10 shadow-2xl">
-                <DropdownMenuItem asChild>
-                  <Link href="/products?category=wordpress" className="flex items-center gap-2.5 cursor-pointer text-muted-foreground hover:text-white">
-                    <Globe className="w-4 h-4 text-blue-400/80" /> WordPress Templates
+            {/* Categories dropdown — opens on hover */}
+            <div
+              className="relative"
+              onMouseEnter={() => setCatOpen(true)}
+              onMouseLeave={() => setCatOpen(false)}
+            >
+              <button className="flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-white hover:bg-white/5 transition-all duration-200">
+                Categories <ChevronDown className={`w-3.5 h-3.5 mt-px transition-transform duration-200 ${catOpen ? "rotate-180" : ""}`} />
+              </button>
+              {catOpen && (
+                <div className="absolute top-full left-0 mt-1 w-52 rounded-lg border border-white/10 bg-[hsl(230_15%_10%)] shadow-2xl py-1 z-50">
+                  <Link
+                    href="/products?category=wordpress"
+                    className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
+                    onClick={() => setCatOpen(false)}
+                  >
+                    <Globe className="w-4 h-4 text-blue-400/80 shrink-0" /> WordPress Templates
                   </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/products?category=shopify" className="flex items-center gap-2.5 cursor-pointer text-muted-foreground hover:text-white">
-                    <ShoppingBag className="w-4 h-4 text-green-400/80" /> Shopify Templates
+                  <Link
+                    href="/products?category=shopify"
+                    className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
+                    onClick={() => setCatOpen(false)}
+                  >
+                    <ShoppingBag className="w-4 h-4 text-green-400/80 shrink-0" /> Shopify Templates
                   </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild>
-                  <Link href="/products?category=blogger" className="flex items-center gap-2.5 cursor-pointer text-muted-foreground hover:text-white">
-                    <BookOpen className="w-4 h-4 text-orange-400/80" /> Blogger Templates
+                  <Link
+                    href="/products?category=blogger"
+                    className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
+                    onClick={() => setCatOpen(false)}
+                  >
+                    <BookOpen className="w-4 h-4 text-orange-400/80 shrink-0" /> Blogger Templates
                   </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                </div>
+              )}
+            </div>
 
             {isAdmin && (
               <Link

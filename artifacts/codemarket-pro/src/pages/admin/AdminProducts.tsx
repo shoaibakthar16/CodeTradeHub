@@ -16,6 +16,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import AdminLayout from "@/components/layout/AdminLayout";
 import { getProducts, createProduct, updateProduct, deleteProduct } from "@/lib/firestore";
+import { uploadProductPreviewImage, uploadProductThumbnail } from "@/lib/storage";
 import { seedDemoProducts } from "@/lib/seedData";
 import { formatPrice } from "@/lib/stripe";
 import type { Product } from "@/types";
@@ -40,6 +41,9 @@ export default function AdminProducts() {
   const [saving, setSaving] = useState(false);
   const [seeding, setSeeding] = useState(false);
   const [newImageUrl, setNewImageUrl] = useState("");
+  const [uploadingPreview, setUploadingPreview] = useState(false);
+  const [uploadingThumb, setUploadingThumb] = useState(false);
+  const [uploadPreviewProgress, setUploadPreviewProgress] = useState(0);
 
   const load = () => {
     setLoading(true);
@@ -69,6 +73,48 @@ export default function AdminProducts() {
 
   const removePreviewImage = (idx: number) => {
     setForm((f) => ({ ...f, previewImages: f.previewImages.filter((_, i) => i !== idx) }));
+  };
+
+  const handlePreviewImageUpload = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const productId = editing?.id || `temp_${Date.now()}`;
+    setUploadingPreview(true);
+    setUploadPreviewProgress(0);
+    try {
+      const urls: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const url = await uploadProductPreviewImage(
+          files[i],
+          productId,
+          form.previewImages.length + i,
+          (p) => setUploadPreviewProgress(Math.round(((i / files.length) + p / 100 / files.length) * 100))
+        );
+        urls.push(url);
+      }
+      setForm((f) => ({ ...f, previewImages: [...f.previewImages, ...urls] }));
+      setUploadPreviewProgress(100);
+      toast({ title: `${urls.length} image${urls.length > 1 ? "s" : ""} uploaded!` });
+    } catch (err) {
+      toast({ title: "Upload failed", description: String(err), variant: "destructive" });
+    } finally {
+      setUploadingPreview(false);
+      setTimeout(() => setUploadPreviewProgress(0), 1500);
+    }
+  };
+
+  const handleThumbnailUpload = async (file: File | null) => {
+    if (!file) return;
+    const productId = editing?.id || `temp_${Date.now()}`;
+    setUploadingThumb(true);
+    try {
+      const url = await uploadProductThumbnail(file, productId);
+      setForm((f) => ({ ...f, thumbnail: url }));
+      toast({ title: "Thumbnail uploaded!" });
+    } catch (err) {
+      toast({ title: "Thumbnail upload failed", description: String(err), variant: "destructive" });
+    } finally {
+      setUploadingThumb(false);
+    }
   };
 
   const openCreate = () => { setEditing(null); setForm(emptyForm); setNewImageUrl(""); setOpen(true); };
@@ -330,8 +376,32 @@ export default function AdminProducts() {
               <Input value={form.version} onChange={(e)=>setForm({...form,version:e.target.value})} className="mt-1 font-mono" />
             </div>
             <div>
-              <Label className="text-xs">Thumbnail URL</Label>
-              <Input value={form.thumbnail} onChange={(e)=>setForm({...form,thumbnail:e.target.value})} className="mt-1" placeholder="https://..." />
+              <Label className="text-xs mb-1.5 block">Thumbnail</Label>
+              <div className="flex gap-2">
+                <Input value={form.thumbnail} onChange={(e)=>setForm({...form,thumbnail:e.target.value})} placeholder="https://... or upload →" className="text-xs" />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={uploadingThumb}
+                  onClick={() => document.getElementById("thumb-upload-input")?.click()}
+                  className="shrink-0 gap-1.5"
+                >
+                  {uploadingThumb ? (
+                    <span className="w-3.5 h-3.5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <ImagePlus className="w-3.5 h-3.5" />
+                  )}
+                  {uploadingThumb ? "Uploading…" : "Upload"}
+                </Button>
+                <input
+                  id="thumb-upload-input"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => handleThumbnailUpload(e.target.files?.[0] || null)}
+                />
+              </div>
               {form.thumbnail && (
                 <img src={form.thumbnail} alt="thumbnail" className="mt-2 w-full h-24 object-cover rounded-lg border border-border" onError={(e)=>(e.currentTarget.style.display="none")} />
               )}
@@ -344,26 +414,66 @@ export default function AdminProducts() {
                 Demo Screenshots ({form.previewImages.length} image{form.previewImages.length !== 1 ? "s" : ""})
               </Label>
 
-              {/* Add new image */}
+              {/* Add new image — URL or upload */}
               <div className="flex gap-2 mb-3">
                 <Input
                   value={newImageUrl}
                   onChange={(e) => setNewImageUrl(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addPreviewImage())}
-                  placeholder="https://i.imgur.com/... or any image URL"
+                  placeholder="Paste image URL… or click Upload"
                   className="text-xs font-mono"
+                  disabled={uploadingPreview}
                 />
                 <Button
                   type="button"
                   size="sm"
                   variant="outline"
                   onClick={addPreviewImage}
-                  disabled={!newImageUrl.trim()}
+                  disabled={!newImageUrl.trim() || uploadingPreview}
                   className="shrink-0"
                 >
                   <Plus className="w-3.5 h-3.5 mr-1" /> Add
                 </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="secondary"
+                  disabled={uploadingPreview}
+                  onClick={() => document.getElementById("preview-images-input")?.click()}
+                  className="shrink-0 gap-1.5"
+                >
+                  {uploadingPreview ? (
+                    <span className="w-3.5 h-3.5 border-2 border-foreground/40 border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <ImagePlus className="w-3.5 h-3.5" />
+                  )}
+                  {uploadingPreview ? `${uploadPreviewProgress}%` : "Upload"}
+                </Button>
+                <input
+                  id="preview-images-input"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={(e) => { handlePreviewImageUpload(e.target.files); e.target.value = ""; }}
+                />
               </div>
+
+              {/* Upload progress bar */}
+              {uploadingPreview && (
+                <div className="mb-3 space-y-1">
+                  <div className="flex justify-between text-[11px] text-muted-foreground">
+                    <span>Uploading images to Firebase Storage…</span>
+                    <span>{uploadPreviewProgress}%</span>
+                  </div>
+                  <div className="h-1.5 rounded-full bg-muted overflow-hidden">
+                    <div
+                      className="h-full bg-primary transition-all duration-300 rounded-full"
+                      style={{ width: `${uploadPreviewProgress}%` }}
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Preview grid */}
               {form.previewImages.length > 0 ? (

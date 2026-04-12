@@ -41,6 +41,16 @@ export async function uploadProductThumbnail(
   return uploadFile(file, `thumbnails/${productId}/${file.name}`, onProgress);
 }
 
+export async function uploadProductPreviewImage(
+  file: File,
+  productId: string,
+  index: number,
+  onProgress?: (progress: number) => void
+): Promise<string> {
+  const ext = file.name.split(".").pop() || "jpg";
+  return uploadFile(file, `previews/${productId}/preview_${index}_${Date.now()}.${ext}`, onProgress);
+}
+
 export async function deleteFile(url: string): Promise<void> {
   const fileRef = ref(storage, url);
   await deleteObject(fileRef);

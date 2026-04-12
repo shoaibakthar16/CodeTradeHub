@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Eye, EyeOff, Package, Sparkles } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, Package, Sparkles, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -145,12 +145,13 @@ export default function AdminProducts() {
 
   return (
     <AdminLayout>
-      <div className="flex items-center justify-between mb-6">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <h1 className="text-xl font-bold">Products</h1>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button size="sm" variant="outline" onClick={handleSeedData} disabled={seeding}>
             <Sparkles className="w-4 h-4 mr-1.5" />
-            {seeding ? "Adding demo data…" : "Seed Demo Data"}
+            {seeding ? "Adding…" : "Seed Demo Data"}
           </Button>
           <Button size="sm" onClick={openCreate} data-testid="button-create-product">
             <Plus className="w-4 h-4 mr-1.5" /> New Product
@@ -164,7 +165,7 @@ export default function AdminProducts() {
         <div className="text-center py-16 border border-dashed border-border rounded-xl">
           <Package className="w-10 h-10 text-muted-foreground/30 mx-auto mb-3" />
           <p className="text-sm text-muted-foreground mb-3">No products yet</p>
-          <div className="flex gap-2 justify-center">
+          <div className="flex gap-2 justify-center flex-wrap">
             <Button size="sm" variant="outline" onClick={handleSeedData} disabled={seeding}>
               <Sparkles className="w-4 h-4 mr-1.5" />
               {seeding ? "Adding…" : "Seed Demo Data"}
@@ -173,72 +174,122 @@ export default function AdminProducts() {
           </div>
         </div>
       ) : (
-        <div className="rounded-lg border border-border overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50">
-              <tr>
-                <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Product</th>
-                <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Category</th>
-                <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Price</th>
-                <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Status</th>
-                <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Featured</th>
-                <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {products.map((p) => (
-                <tr key={p.id} className="hover:bg-muted/30 transition-colors" data-testid={`product-row-${p.id}`}>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      {p.thumbnail && <img src={p.thumbnail} alt="" className="w-8 h-6 rounded object-cover" />}
-                      <div>
-                        <div className="font-medium text-xs">{p.title}</div>
-                        <div className="text-xs font-mono text-muted-foreground">{p.slug}</div>
-                      </div>
+        <>
+          {/* ── Desktop table ── */}
+          <div className="hidden sm:block rounded-lg border border-border overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm min-w-[640px]">
+                <thead className="bg-muted/50">
+                  <tr>
+                    <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Product</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Category</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Price</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Status</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Featured</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {products.map((p) => (
+                    <tr key={p.id} className="hover:bg-muted/30 transition-colors" data-testid={`product-row-${p.id}`}>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          {p.thumbnail && <img src={p.thumbnail} alt="" className="w-8 h-6 rounded object-cover" />}
+                          <div>
+                            <div className="font-medium text-xs">{p.title}</div>
+                            <div className="text-xs font-mono text-muted-foreground">{p.slug}</div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3"><Badge variant="outline" className="text-xs">{p.category}</Badge></td>
+                      <td className="px-4 py-3 text-xs font-medium">{formatPrice(p.price)}</td>
+                      <td className="px-4 py-3">
+                        <button onClick={() => togglePublish(p)} data-testid={`toggle-publish-${p.id}`}>
+                          {p.published
+                            ? <Badge className="text-xs bg-green-500/10 text-green-400 border-green-500/20"><Eye className="w-3 h-3 mr-1"/>Published</Badge>
+                            : <Badge variant="outline" className="text-xs text-muted-foreground"><EyeOff className="w-3 h-3 mr-1"/>Draft</Badge>
+                          }
+                        </button>
+                      </td>
+                      <td className="px-4 py-3">
+                        <button onClick={() => toggleFeatured(p)}>
+                          {p.featured
+                            ? <Badge className="text-xs bg-amber-500/10 text-amber-400 border-amber-500/20">⭐ Featured</Badge>
+                            : <Badge variant="outline" className="text-xs text-muted-foreground">—</Badge>
+                          }
+                        </button>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-1">
+                          <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openEdit(p)} data-testid={`button-edit-${p.id}`}>
+                            <Pencil className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => handleDelete(p.id, p.title)} data-testid={`button-delete-${p.id}`}>
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* ── Mobile card list ── */}
+          <div className="sm:hidden space-y-3">
+            {products.map((p) => (
+              <div key={p.id} className="rounded-lg border border-border bg-card p-3" data-testid={`product-row-${p.id}`}>
+                <div className="flex items-start gap-3">
+                  {p.thumbnail && (
+                    <img src={p.thumbnail} alt="" className="w-12 h-9 rounded object-cover shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="font-medium text-sm truncate">{p.title}</div>
+                    <div className="text-xs font-mono text-muted-foreground truncate">{p.slug}</div>
+                    <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+                      <Badge variant="outline" className="text-xs">{p.category}</Badge>
+                      <span className="text-xs font-semibold text-primary">{formatPrice(p.price)}</span>
+                      <button onClick={() => togglePublish(p)} data-testid={`toggle-publish-${p.id}`}>
+                        {p.published
+                          ? <Badge className="text-xs bg-green-500/10 text-green-400 border-green-500/20"><Eye className="w-3 h-3 mr-1"/>Published</Badge>
+                          : <Badge variant="outline" className="text-xs text-muted-foreground"><EyeOff className="w-3 h-3 mr-1"/>Draft</Badge>
+                        }
+                      </button>
+                      {p.featured && (
+                        <Badge className="text-xs bg-amber-500/10 text-amber-400 border-amber-500/20">⭐ Featured</Badge>
+                      )}
                     </div>
-                  </td>
-                  <td className="px-4 py-3"><Badge variant="outline" className="text-xs">{p.category}</Badge></td>
-                  <td className="px-4 py-3 text-xs font-medium">{formatPrice(p.price)}</td>
-                  <td className="px-4 py-3">
-                    <button onClick={() => togglePublish(p)} data-testid={`toggle-publish-${p.id}`}>
-                      {p.published
-                        ? <Badge className="text-xs bg-green-500/10 text-green-400 border-green-500/20"><Eye className="w-3 h-3 mr-1"/>Published</Badge>
-                        : <Badge variant="outline" className="text-xs text-muted-foreground"><EyeOff className="w-3 h-3 mr-1"/>Draft</Badge>
-                      }
-                    </button>
-                  </td>
-                  <td className="px-4 py-3">
-                    <button onClick={() => toggleFeatured(p)}>
-                      {p.featured
-                        ? <Badge className="text-xs bg-amber-500/10 text-amber-400 border-amber-500/20">⭐ Featured</Badge>
-                        : <Badge variant="outline" className="text-xs text-muted-foreground">—</Badge>
-                      }
-                    </button>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-1">
-                      <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => openEdit(p)} data-testid={`button-edit-${p.id}`}>
-                        <Pencil className="w-3.5 h-3.5" />
-                      </Button>
-                      <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive" onClick={() => handleDelete(p.id, p.title)} data-testid={`button-delete-${p.id}`}>
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                  <div className="flex flex-col gap-1 shrink-0">
+                    <Button size="icon" variant="ghost" className="h-8 w-8" onClick={() => openEdit(p)} data-testid={`button-edit-${p.id}`}>
+                      <Pencil className="w-3.5 h-3.5" />
+                    </Button>
+                    <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive" onClick={() => handleDelete(p.id, p.title)} data-testid={`button-delete-${p.id}`}>
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 mt-2 pt-2 border-t border-border/50">
+                  <button onClick={() => toggleFeatured(p)} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground">
+                    <Star className={`w-3.5 h-3.5 ${p.featured ? "fill-amber-400 text-amber-400" : ""}`} />
+                    {p.featured ? "Unfeature" : "Mark Featured"}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       )}
 
+      {/* ── Product Dialog ── */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+        <DialogContent className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editing ? "Edit Product" : "Create Product"}</DialogTitle>
           </DialogHeader>
-          <div className="grid grid-cols-2 gap-4 py-2">
-            <div className="col-span-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
+            <div className="sm:col-span-2">
               <Label className="text-xs">Title *</Label>
               <Input value={form.title} onChange={(e)=>setForm({...form,title:e.target.value})} className="mt-1" data-testid="input-product-title" />
             </div>
@@ -269,23 +320,23 @@ export default function AdminProducts() {
               <Label className="text-xs">Thumbnail URL</Label>
               <Input value={form.thumbnail} onChange={(e)=>setForm({...form,thumbnail:e.target.value})} className="mt-1" placeholder="https://..." />
             </div>
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <Label className="text-xs">Short Description</Label>
               <Input value={form.shortDescription} onChange={(e)=>setForm({...form,shortDescription:e.target.value})} className="mt-1" />
             </div>
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <Label className="text-xs">Full Description</Label>
               <Textarea value={form.description} onChange={(e)=>setForm({...form,description:e.target.value})} className="mt-1" rows={3} />
             </div>
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <Label className="text-xs">Tech Stack (comma separated)</Label>
               <Input value={form.techStack} onChange={(e)=>setForm({...form,techStack:e.target.value})} className="mt-1 font-mono" placeholder="React, TypeScript, Tailwind" />
             </div>
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <Label className="text-xs">Features (one per line)</Label>
-              <Textarea value={form.features} onChange={(e)=>setForm({...form,features:e.target.value})} className="mt-1" rows={3} placeholder="Authentication system&#10;Payment integration&#10;Admin dashboard" />
+              <Textarea value={form.features} onChange={(e)=>setForm({...form,features:e.target.value})} className="mt-1" rows={3} placeholder={"Authentication system\nPayment integration\nAdmin dashboard"} />
             </div>
-            <div className="col-span-2">
+            <div className="sm:col-span-2">
               <Label className="text-xs">Tags (comma separated)</Label>
               <Input value={form.tags} onChange={(e)=>setForm({...form,tags:e.target.value})} className="mt-1" placeholder="react, saas, dashboard" />
             </div>
@@ -305,18 +356,18 @@ export default function AdminProducts() {
               <Label className="text-xs">File Name</Label>
               <Input value={form.fileName} onChange={(e)=>setForm({...form,fileName:e.target.value})} className="mt-1 font-mono" placeholder="product-v1.0.zip" />
             </div>
-            <div className="col-span-2 flex items-center gap-2">
+            <div className="sm:col-span-2 flex items-center gap-2">
               <Switch checked={form.published} onCheckedChange={(v)=>setForm({...form,published:v})} id="published" />
               <Label htmlFor="published" className="text-xs cursor-pointer">Published (visible to buyers)</Label>
             </div>
-            <div className="col-span-2 flex items-center gap-2">
+            <div className="sm:col-span-2 flex items-center gap-2">
               <Switch checked={form.featured} onCheckedChange={(v)=>setForm({...form,featured:v})} id="featured" />
               <Label htmlFor="featured" className="text-xs cursor-pointer">⭐ Featured (highlighted with badge)</Label>
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={()=>setOpen(false)}>Cancel</Button>
-            <Button onClick={handleSave} disabled={saving} data-testid="button-save-product">
+          <DialogFooter className="flex-col-reverse sm:flex-row gap-2">
+            <Button variant="outline" onClick={()=>setOpen(false)} className="w-full sm:w-auto">Cancel</Button>
+            <Button onClick={handleSave} disabled={saving} className="w-full sm:w-auto" data-testid="button-save-product">
               {saving ? "Saving..." : editing ? "Update" : "Create"}
             </Button>
           </DialogFooter>

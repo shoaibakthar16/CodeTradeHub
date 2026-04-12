@@ -147,22 +147,22 @@ export default function HomePage() {
             </div>
             <h2 className="text-lg font-semibold">Browse by Category</h2>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-6 gap-2 sm:gap-3">
             {CATEGORIES.map((cat) => {
               const Icon = cat.icon;
               const count = allProducts.filter((p) => p.category === cat.slug).length;
               return (
                 <Link key={cat.slug} href={`/products?category=${cat.slug}`}>
                   <div
-                    className="flex flex-col items-center gap-2 p-4 rounded-xl border border-border bg-card hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer group"
+                    className="flex flex-col items-center gap-1.5 p-2 sm:p-4 rounded-xl border border-border bg-card hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer group"
                     data-testid={`link-category-${cat.slug}`}
                   >
-                    <Icon className={`w-6 h-6 ${cat.color} group-hover:scale-110 transition-transform`} />
-                    <span className="text-xs text-center text-muted-foreground group-hover:text-foreground transition-colors font-medium leading-tight">
+                    <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${cat.color} group-hover:scale-110 transition-transform`} />
+                    <span className="text-[10px] sm:text-xs text-center text-muted-foreground group-hover:text-foreground transition-colors font-medium leading-tight">
                       {cat.label}
                     </span>
                     {count > 0 && (
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4">
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 hidden sm:flex">
                         {count}
                       </Badge>
                     )}

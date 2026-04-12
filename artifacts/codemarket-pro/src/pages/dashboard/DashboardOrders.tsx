@@ -25,7 +25,7 @@ export default function DashboardOrders() {
 
   useEffect(() => {
     if (!user) { setLocation("/login"); return; }
-    getOrdersByUser(user.uid).then(setOrders).finally(() => setLoading(false));
+    getOrdersByUser(user.uid).then(setOrders).catch(() => {}).finally(() => setLoading(false));
   }, [user]);
 
   if (!user) return null;

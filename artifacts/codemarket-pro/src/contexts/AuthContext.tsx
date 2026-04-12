@@ -35,8 +35,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
       if (firebaseUser) {
-        const profile = await getUserProfile(firebaseUser.uid);
-        setUserProfile(profile);
+        try {
+          const profile = await getUserProfile(firebaseUser.uid);
+          setUserProfile(profile);
+        } catch {
+          // Firestore rules may not be set up yet — fall back gracefully
+          setUserProfile(null);
+        }
       } else {
         setUserProfile(null);
       }

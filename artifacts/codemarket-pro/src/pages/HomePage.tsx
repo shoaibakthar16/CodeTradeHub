@@ -25,6 +25,7 @@ export default function HomePage() {
   useEffect(() => {
     getProducts({ publishedOnly: true, limitCount: 8 })
       .then(setProducts)
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 

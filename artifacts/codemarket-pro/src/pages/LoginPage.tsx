@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { Code2, Chrome, Eye, EyeOff, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,10 +22,11 @@ export default function LoginPage() {
   const [showPass, setShowPass] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  if (user) {
-    setLocation("/dashboard");
-    return null;
-  }
+  useEffect(() => {
+    if (user) setLocation("/dashboard");
+  }, [user]);
+
+  if (user) return null;
 
   const getFirebaseErrorMessage = (err: unknown): string => {
     const code = (err as { code?: string })?.code || "";

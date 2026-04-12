@@ -21,7 +21,7 @@ export default function DashboardDownloads() {
     getPurchasedProductIds(user.uid).then(async (ids) => {
       const fetched = await Promise.all(ids.map((id) => getProductById(id)));
       setProducts(fetched.filter(Boolean) as Product[]);
-    }).finally(() => setLoading(false));
+    }).catch(() => {}).finally(() => setLoading(false));
   }, [user]);
 
   if (!user) return null;

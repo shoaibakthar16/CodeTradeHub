@@ -43,6 +43,7 @@ export default function ProductsPage() {
   useEffect(() => {
     getProducts({ publishedOnly: true })
       .then(setAllProducts)
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 

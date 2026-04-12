@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Download, Package, ShoppingBag, User, ExternalLink } from "lucide-react";
+import { Download, Package, ShoppingBag, User, ExternalLink, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,12 +16,15 @@ export default function DashboardPage() {
   const [, setLocation] = useLocation();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [permError, setPermError] = useState(false);
 
   useEffect(() => {
     if (!user) { setLocation("/login"); return; }
     getPurchasedProductIds(user.uid).then(async (ids) => {
       const fetched = await Promise.all(ids.map((id) => getProductById(id)));
       setProducts(fetched.filter(Boolean) as Product[]);
+    }).catch((err) => {
+      if (err?.code === "permission-denied") setPermError(true);
     }).finally(() => setLoading(false));
   }, [user]);
 
@@ -31,6 +34,43 @@ export default function DashboardPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <div className="flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        {/* Firestore rules error */}
+        {permError && (
+          <div className="mb-6 p-4 rounded-lg border border-yellow-500/30 bg-yellow-500/5 flex gap-3">
+            <AlertTriangle className="w-5 h-5 text-yellow-400 shrink-0 mt-0.5" />
+            <div className="text-sm">
+              <p className="font-semibold text-yellow-400 mb-1">Firestore security rules need updating</p>
+              <p className="text-yellow-400/80 mb-2">Your Firebase project is blocking reads. Paste these rules in Firebase Console → Firestore → Rules:</p>
+              <pre className="text-xs font-mono bg-black/30 rounded p-3 text-yellow-300 overflow-x-auto whitespace-pre">{`rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /products/{id} {
+      allow read: if resource.data.published == true;
+      allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    match /orders/{id} {
+      allow create: if request.auth != null;
+      allow read: if request.auth != null && (resource.data.userId == request.auth.uid || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+      allow update: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    match /reviews/{id} {
+      allow read: if resource.data.approved == true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    match /coupons/{id} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+  }
+}`}</pre>
+            </div>
+          </div>
+        )}
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>

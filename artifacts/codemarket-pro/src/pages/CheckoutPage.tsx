@@ -142,7 +142,7 @@ export default function CheckoutPage() {
   const handleStripeCheckout = async () => {
     setPaying(true);
     try {
-      const orderId = await createOrder({
+      const orderData: Parameters<typeof createOrder>[0] = {
         userId: user.uid,
         userEmail: user.email!,
         userName: user.displayName || "User",
@@ -151,19 +151,22 @@ export default function CheckoutPage() {
           productTitle: i.product.title,
           productSlug: i.product.slug,
           price: i.product.price,
-          thumbnail: i.product.thumbnail,
+          thumbnail: i.product.thumbnail || "",
         })),
         total,
         status: "paid",
         paymentMethod: "stripe",
-        couponCode: couponCode || undefined,
-        discountAmount: discountAmount || undefined,
-      });
+      };
+      if (couponCode) orderData.couponCode = couponCode;
+      if (discountAmount) orderData.discountAmount = discountAmount;
+      const orderId = await createOrder(orderData);
       clearCart();
       setPendingOrderId(orderId);
       setShowProcessing(true);
-    } catch {
-      toast({ title: "Payment failed", description: "Something went wrong. Please try again.", variant: "destructive" });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      console.error("Checkout error:", err);
+      toast({ title: "Payment failed", description: msg, variant: "destructive" });
       setPaying(false);
     }
   };
@@ -175,7 +178,7 @@ export default function CheckoutPage() {
 
   const handleWhatsApp = async () => {
     try {
-      await createOrder({
+      const waOrderData: Parameters<typeof createOrder>[0] = {
         userId: user.uid,
         userEmail: user.email!,
         userName: user.displayName || "User",
@@ -184,14 +187,15 @@ export default function CheckoutPage() {
           productTitle: i.product.title,
           productSlug: i.product.slug,
           price: i.product.price,
-          thumbnail: i.product.thumbnail,
+          thumbnail: i.product.thumbnail || "",
         })),
         total,
         status: "pending",
         paymentMethod: "whatsapp",
-        couponCode: couponCode || undefined,
-        discountAmount: discountAmount || undefined,
-      });
+      };
+      if (couponCode) waOrderData.couponCode = couponCode;
+      if (discountAmount) waOrderData.discountAmount = discountAmount;
+      await createOrder(waOrderData);
       window.open(whatsappUrl, "_blank");
       toast({ title: "WhatsApp opened", description: "Your order has been saved. Complete payment via WhatsApp." });
     } catch {

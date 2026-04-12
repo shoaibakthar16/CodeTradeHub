@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Code2, Chrome, Eye, EyeOff, Info } from "lucide-react";
+import { Code2, Chrome, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -129,19 +129,6 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold mb-2">Welcome back</h1>
           <p className="text-sm text-muted-foreground mb-6">Sign in to access your purchased source code and dashboard.</p>
 
-          {/* Firebase setup notice */}
-          <div className="mb-6 p-3 rounded-lg border border-yellow-500/20 bg-yellow-500/5 text-xs text-yellow-400 space-y-1.5">
-            <div className="flex items-center gap-1.5 font-semibold">
-              <Info className="w-3.5 h-3.5 shrink-0" />
-              Firebase setup required before signing in
-            </div>
-            <ol className="list-decimal list-inside space-y-1 text-yellow-400/80 pl-1">
-              <li>Enable <strong className="text-yellow-400">Authentication</strong> → Sign-in method → Google + Email/Password</li>
-              <li>Add your <strong className="text-yellow-400">.replit.dev</strong> domain to Authorized Domains</li>
-              <li>Enable <strong className="text-yellow-400">Firestore</strong> Database in your Firebase project</li>
-              <li>Enable <strong className="text-yellow-400">Storage</strong> in your Firebase project</li>
-            </ol>
-          </div>
 
           <Button
             variant="outline"

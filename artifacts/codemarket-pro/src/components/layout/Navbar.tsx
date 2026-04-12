@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import {
   ShoppingCart, Menu, X, User, LogOut, LayoutDashboard, Shield,
-  ChevronDown, Info, HeadphonesIcon, FileText, Home, Zap
+  ChevronDown, Home, Zap
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,12 +17,6 @@ import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 
-const moreLinks = [
-  { label: "About Us", href: "/about", icon: Info },
-  { label: "Support", href: "/support", icon: HeadphonesIcon },
-  { label: "Terms & Conditions", href: "/terms", icon: FileText },
-  { label: "Privacy Policy", href: "/privacy", icon: FileText },
-];
 
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -103,31 +97,6 @@ export default function Navbar() {
                 )}
               </Link>
             ))}
-
-            {/* More dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-white hover:bg-white/5 transition-all duration-200">
-                  More <ChevronDown className="w-3.5 h-3.5 mt-px" />
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="start"
-                className="w-52 bg-[hsl(230_15%_10%)] border-white/10 shadow-2xl"
-              >
-                {moreLinks.map(({ label, href, icon: Icon }) => (
-                  <DropdownMenuItem key={href} asChild>
-                    <Link
-                      href={href}
-                      className="flex items-center gap-2.5 cursor-pointer text-muted-foreground hover:text-white"
-                    >
-                      <Icon className="w-4 h-4 text-primary/70" />
-                      {label}
-                    </Link>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
 
             {isAdmin && (
               <Link
@@ -271,17 +240,6 @@ export default function Navbar() {
             >
               <Zap className="w-4 h-4" /> Products
             </Link>
-            <div className="h-px bg-white/8 mx-1 my-2" />
-            {moreLinks.map(({ label, href, icon: Icon }) => (
-              <Link
-                key={href}
-                href={href}
-                className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-white/5 hover:text-white transition-colors"
-                onClick={() => setMobileOpen(false)}
-              >
-                <Icon className="w-4 h-4 text-primary/60" /> {label}
-              </Link>
-            ))}
             {user && (
               <>
                 <div className="h-px bg-white/8 mx-1 my-2" />

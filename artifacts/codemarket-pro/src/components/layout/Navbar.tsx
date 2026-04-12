@@ -2,7 +2,8 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import {
   ShoppingCart, Menu, X, User, LogOut, LayoutDashboard, Shield,
-  ChevronDown, Home, Zap, Globe, ShoppingBag, BookOpen
+  ChevronDown, Home, Zap, Globe, ShoppingBag, BookOpen,
+  Layers, Smartphone, Code2, Store, Puzzle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,10 +19,24 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 
 
+const ALL_CATEGORIES = [
+  { label: "Website Templates", slug: "templates",    icon: Layers,      color: "text-violet-400" },
+  { label: "SaaS Starter Kits", slug: "saas",         icon: Zap,         color: "text-yellow-400" },
+  { label: "Mobile Apps",       slug: "mobile",       icon: Smartphone,  color: "text-cyan-400"   },
+  { label: "Admin Panels",      slug: "admin-panels", icon: Shield,      color: "text-green-400"  },
+  { label: "E-Commerce",        slug: "ecommerce",    icon: ShoppingBag, color: "text-pink-400"   },
+  { label: "Full-Stack Apps",   slug: "fullstack",    icon: Code2,       color: "text-orange-400" },
+  { label: "WordPress Templates", slug: "wordpress",  icon: Globe,       color: "text-blue-400"   },
+  { label: "Blogger Templates", slug: "blogger",      icon: BookOpen,    color: "text-orange-300" },
+  { label: "Shopify Templates", slug: "shopify",      icon: Store,       color: "text-green-300"  },
+  { label: "Browser Extensions", slug: "extensions",  icon: Puzzle,      color: "text-rose-400"   },
+];
+
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [catOpen, setCatOpen] = useState(false);
+  const [allCatOpen, setAllCatOpen] = useState(false);
   const { user, isAdmin, logout } = useAuth();
   const { itemCount } = useCart();
   const [location, setLocation] = useLocation();
@@ -99,7 +114,45 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* Categories dropdown — opens on hover */}
+            {/* All Categories mega-dropdown — opens on hover */}
+            <div
+              className="relative"
+              onMouseEnter={() => setAllCatOpen(true)}
+              onMouseLeave={() => setAllCatOpen(false)}
+            >
+              <button className="flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-white hover:bg-white/5 transition-all duration-200">
+                Category <ChevronDown className={`w-3.5 h-3.5 mt-px transition-transform duration-200 ${allCatOpen ? "rotate-180" : ""}`} />
+              </button>
+              {allCatOpen && (
+                <div className="absolute top-full left-0 mt-1 w-[420px] rounded-xl border border-white/10 bg-[hsl(230_15%_10%)] shadow-2xl z-50 p-3">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50 px-2 pb-2">Browse by Category</p>
+                  <div className="grid grid-cols-2 gap-0.5">
+                    {ALL_CATEGORIES.map(({ label, slug, icon: Icon, color }) => (
+                      <Link
+                        key={slug}
+                        href={`/products?category=${slug}`}
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors group"
+                        onClick={() => setAllCatOpen(false)}
+                      >
+                        <Icon className={`w-4 h-4 shrink-0 ${color}`} />
+                        <span className="truncate">{label}</span>
+                      </Link>
+                    ))}
+                  </div>
+                  <div className="mt-2 pt-2 border-t border-white/8">
+                    <Link
+                      href="/products"
+                      className="flex items-center justify-center gap-2 py-2 text-xs font-semibold text-primary hover:text-white transition-colors"
+                      onClick={() => setAllCatOpen(false)}
+                    >
+                      View all products →
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Templates dropdown — opens on hover */}
             <div
               className="relative"
               onMouseEnter={() => setCatOpen(true)}
@@ -277,6 +330,18 @@ export default function Navbar() {
             >
               <Zap className="w-4 h-4" /> Products
             </Link>
+            <div className="h-px bg-white/8 mx-1 my-1.5" />
+            <p className="px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">Browse by Category</p>
+            {ALL_CATEGORIES.map(({ label, slug, icon: Icon, color }) => (
+              <Link
+                key={slug}
+                href={`/products?category=${slug}`}
+                className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-white/5 hover:text-white transition-colors"
+                onClick={() => setMobileOpen(false)}
+              >
+                <Icon className={`w-4 h-4 shrink-0 ${color}`} /> {label}
+              </Link>
+            ))}
             <div className="h-px bg-white/8 mx-1 my-1.5" />
             <p className="px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">Templates</p>
             <Link href="/products?category=wordpress" className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-white/5 hover:text-white transition-colors" onClick={() => setMobileOpen(false)}>

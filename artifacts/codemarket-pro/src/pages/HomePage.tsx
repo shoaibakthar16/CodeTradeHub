@@ -45,11 +45,11 @@ function SectionHeader({ title, icon: Icon, href, color }: { title: string; icon
 function ProductRow({ products, loading }: { products: Product[]; loading: boolean }) {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="rounded-xl border border-border overflow-hidden">
             <Skeleton className="aspect-video w-full" />
-            <div className="p-4 space-y-2">
+            <div className="p-3 space-y-2">
               <Skeleton className="h-4 w-3/4" />
               <Skeleton className="h-3 w-full" />
               <Skeleton className="h-3 w-1/2" />
@@ -61,7 +61,7 @@ function ProductRow({ products, loading }: { products: Product[]; loading: boole
   }
   if (products.length === 0) return null;
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
       {products.map((product) => (
         <ProductCard key={product.id} product={product} />
       ))}

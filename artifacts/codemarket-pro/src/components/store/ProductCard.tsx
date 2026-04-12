@@ -43,26 +43,26 @@ export default function ProductCard({ product }: ProductCardProps) {
           )}
 
           {/* Top-left badges */}
-          <div className="absolute top-2 left-2 flex flex-col gap-1">
-            <Badge variant="secondary" className="text-xs font-mono">v{product.version}</Badge>
+          <div className="absolute top-1.5 left-1.5 flex flex-col gap-1">
+            <Badge variant="secondary" className="text-[10px] font-mono px-1 py-0">v{product.version}</Badge>
             {product.featured && (
-              <Badge className="text-xs bg-amber-500 text-black border-0 flex items-center gap-1">
-                <Star className="w-2.5 h-2.5" /> Featured
+              <Badge className="text-[10px] bg-amber-500 text-black border-0 flex items-center gap-0.5 px-1 py-0">
+                <Star className="w-2 h-2" /> Featured
               </Badge>
             )}
           </div>
 
           {/* Discount badge */}
           {hasDiscount && (
-            <Badge className="absolute top-2 right-2 bg-destructive text-destructive-foreground text-xs">
+            <Badge className="absolute top-1.5 right-1.5 bg-destructive text-destructive-foreground text-[10px] px-1 py-0">
               -{discountPct}%
             </Badge>
           )}
 
-          {/* Wishlist button — shown on hover */}
+          {/* Wishlist button */}
           <button
             onClick={(e) => { e.preventDefault(); e.stopPropagation(); toggle(product); }}
-            className={`absolute bottom-2 right-2 w-7 h-7 rounded-full flex items-center justify-center border transition-all
+            className={`absolute bottom-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center border transition-all
               ${wishlisted
                 ? "bg-rose-500 border-rose-500 text-white opacity-100"
                 : "bg-background/80 border-border text-muted-foreground opacity-0 group-hover:opacity-100 hover:text-rose-400 hover:border-rose-400"
@@ -70,25 +70,30 @@ export default function ProductCard({ product }: ProductCardProps) {
             aria-label={wishlisted ? "Remove from wishlist" : "Add to wishlist"}
             data-testid={`button-wishlist-${product.id}`}
           >
-            <Heart className={`w-3.5 h-3.5 ${wishlisted ? "fill-current" : ""}`} />
+            <Heart className={`w-3 h-3 ${wishlisted ? "fill-current" : ""}`} />
           </button>
         </div>
       </Link>
 
       {/* Content */}
-      <div className="flex flex-col flex-1 p-4 gap-3">
+      <div className="flex flex-col flex-1 p-2.5 sm:p-4 gap-2 sm:gap-3">
         <div className="flex-1">
           <Link href={`/products/${product.slug}`}>
-            <h3 className="font-semibold text-sm leading-snug hover:text-primary transition-colors line-clamp-2 mb-1" data-testid={`text-product-title-${product.id}`}>
+            <h3
+              className="font-semibold text-xs sm:text-sm leading-snug hover:text-primary transition-colors line-clamp-2 mb-0.5"
+              data-testid={`text-product-title-${product.id}`}
+            >
               {product.title}
             </h3>
           </Link>
-          <p className="text-xs text-muted-foreground line-clamp-2">{product.shortDescription}</p>
+          <p className="text-[10px] sm:text-xs text-muted-foreground line-clamp-2 hidden sm:block">
+            {product.shortDescription}
+          </p>
         </div>
 
-        {/* Tech stack badges */}
+        {/* Tech stack — desktop only */}
         {product.techStack?.length > 0 && (
-          <div className="flex flex-wrap gap-1">
+          <div className="hidden sm:flex flex-wrap gap-1">
             {product.techStack.slice(0, 3).map((tech) => (
               <span key={tech} className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted text-muted-foreground border border-border">
                 {tech}
@@ -102,8 +107,8 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
 
-        {/* Category */}
-        <div className="flex items-center justify-between">
+        {/* Category — desktop only */}
+        <div className="hidden sm:flex items-center justify-between">
           <Badge variant="outline" className="text-[10px]">{product.category}</Badge>
           {product.demoUrl && (
             <a href={product.demoUrl} target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:text-accent transition-colors flex items-center gap-1">
@@ -114,30 +119,34 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Price & Add to Cart */}
         <div className="flex items-center justify-between pt-2 border-t border-border">
-          <div className="flex items-baseline gap-1.5">
-            <span className="font-bold text-base text-foreground" data-testid={`text-price-${product.id}`}>
+          <div className="flex flex-col sm:flex-row sm:items-baseline gap-0.5 sm:gap-1.5">
+            <span className="font-bold text-sm sm:text-base text-foreground" data-testid={`text-price-${product.id}`}>
               {formatPrice(product.price)}
             </span>
             {hasDiscount && (
-              <span className="text-xs text-muted-foreground line-through">
+              <span className="text-[10px] sm:text-xs text-muted-foreground line-through">
                 {formatPrice(product.originalPrice!)}
               </span>
             )}
           </div>
+          {/* Mobile: icon-only button. Desktop: full button */}
           <Button
             size="sm"
             variant={inCart ? "secondary" : "default"}
             onClick={() => !inCart && addItem(product)}
-            className="h-8 text-xs gap-1.5"
+            className="h-7 w-7 sm:h-8 sm:w-auto sm:px-3 p-0 sm:gap-1.5 text-xs"
             data-testid={`button-add-cart-${product.id}`}
+            aria-label={inCart ? "Added to cart" : "Add to cart"}
           >
             {inCart ? (
               <>
-                <Check className="w-3.5 h-3.5" /> Added
+                <Check className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Added</span>
               </>
             ) : (
               <>
-                <ShoppingCart className="w-3.5 h-3.5" /> Add to Cart
+                <ShoppingCart className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">Add to Cart</span>
               </>
             )}
           </Button>

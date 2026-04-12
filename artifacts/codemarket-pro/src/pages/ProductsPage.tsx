@@ -164,7 +164,7 @@ export default function ProductsPage() {
 
           {/* Grid */}
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="rounded-lg border border-border overflow-hidden">
                   <Skeleton className="aspect-video w-full" />
@@ -186,7 +186,7 @@ export default function ProductsPage() {
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
               {filtered.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

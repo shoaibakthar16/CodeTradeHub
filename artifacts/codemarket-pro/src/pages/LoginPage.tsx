@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Code2, Chrome, Eye, EyeOff } from "lucide-react";
+import { Code2, Chrome, Eye, EyeOff, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -27,13 +27,28 @@ export default function LoginPage() {
     return null;
   }
 
+  const getFirebaseErrorMessage = (err: unknown): string => {
+    const code = (err as { code?: string })?.code || "";
+    if (code === "auth/unauthorized-domain") return "This domain is not authorized in Firebase. Add it to Firebase Console → Authentication → Settings → Authorized domains.";
+    if (code === "auth/popup-blocked") return "Popup was blocked. Allow popups for this site and try again.";
+    if (code === "auth/popup-closed-by-user") return "Sign-in was cancelled.";
+    if (code === "auth/cancelled-popup-request") return "Another sign-in is already in progress.";
+    if (code === "auth/wrong-password" || code === "auth/user-not-found" || code === "auth/invalid-credential") return "Invalid email or password.";
+    if (code === "auth/email-already-in-use") return "An account with this email already exists.";
+    if (code === "auth/weak-password") return "Password should be at least 6 characters.";
+    if (code === "auth/too-many-requests") return "Too many attempts. Please wait before trying again.";
+    if (code === "auth/operation-not-allowed") return "This sign-in method is not enabled. Enable it in Firebase Console → Authentication → Sign-in method.";
+    if ((err as { message?: string })?.message) return (err as { message: string }).message;
+    return "Authentication failed. Check the browser console for details.";
+  };
+
   const handleGoogle = async () => {
     setLoading(true);
     try {
       await signInWithGoogle();
       setLocation("/dashboard");
-    } catch {
-      toast({ title: "Sign in failed", description: "Could not sign in with Google.", variant: "destructive" });
+    } catch (err) {
+      toast({ title: "Sign in failed", description: getFirebaseErrorMessage(err), variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -45,8 +60,8 @@ export default function LoginPage() {
     try {
       await signInWithEmail(loginEmail, loginPassword);
       setLocation("/dashboard");
-    } catch {
-      toast({ title: "Sign in failed", description: "Invalid email or password.", variant: "destructive" });
+    } catch (err) {
+      toast({ title: "Sign in failed", description: getFirebaseErrorMessage(err), variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -62,8 +77,8 @@ export default function LoginPage() {
     try {
       await signUpWithEmail(regEmail, regPassword, regName);
       setLocation("/dashboard");
-    } catch {
-      toast({ title: "Registration failed", description: "Could not create account. Try a different email.", variant: "destructive" });
+    } catch (err) {
+      toast({ title: "Registration failed", description: getFirebaseErrorMessage(err), variant: "destructive" });
     } finally {
       setLoading(false);
     }
@@ -111,7 +126,21 @@ export default function LoginPage() {
           </div>
 
           <h1 className="text-2xl font-bold mb-2">Welcome back</h1>
-          <p className="text-sm text-muted-foreground mb-8">Sign in to access your purchased source code and dashboard.</p>
+          <p className="text-sm text-muted-foreground mb-6">Sign in to access your purchased source code and dashboard.</p>
+
+          {/* Firebase setup notice */}
+          <div className="mb-6 p-3 rounded-lg border border-yellow-500/20 bg-yellow-500/5 text-xs text-yellow-400 space-y-1.5">
+            <div className="flex items-center gap-1.5 font-semibold">
+              <Info className="w-3.5 h-3.5 shrink-0" />
+              Firebase setup required before signing in
+            </div>
+            <ol className="list-decimal list-inside space-y-1 text-yellow-400/80 pl-1">
+              <li>Enable <strong className="text-yellow-400">Authentication</strong> → Sign-in method → Google + Email/Password</li>
+              <li>Add your <strong className="text-yellow-400">.replit.dev</strong> domain to Authorized Domains</li>
+              <li>Enable <strong className="text-yellow-400">Firestore</strong> Database in your Firebase project</li>
+              <li>Enable <strong className="text-yellow-400">Storage</strong> in your Firebase project</li>
+            </ol>
+          </div>
 
           <Button
             variant="outline"

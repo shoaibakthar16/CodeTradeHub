@@ -45,37 +45,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, []);
 
+  const syncProfile = async (firebaseUser: User, extra?: { displayName?: string }) => {
+    try {
+      await createOrUpdateUserProfile({
+        uid: firebaseUser.uid,
+        email: firebaseUser.email!,
+        displayName: extra?.displayName || firebaseUser.displayName || "User",
+        photoURL: firebaseUser.photoURL || undefined,
+        role: "user",
+      });
+      const profile = await getUserProfile(firebaseUser.uid);
+      setUserProfile(profile);
+    } catch {
+      // Firestore may not be configured yet — auth still works
+    }
+  };
+
   const signInWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: "select_account" });
     const result = await signInWithPopup(auth, provider);
-    await createOrUpdateUserProfile({
-      uid: result.user.uid,
-      email: result.user.email!,
-      displayName: result.user.displayName || "User",
-      photoURL: result.user.photoURL || undefined,
-      role: "user",
-    });
-    const profile = await getUserProfile(result.user.uid);
-    setUserProfile(profile);
+    await syncProfile(result.user);
   };
 
   const signInWithEmail = async (email: string, password: string) => {
     const result = await signInWithEmailAndPassword(auth, email, password);
-    const profile = await getUserProfile(result.user.uid);
-    setUserProfile(profile);
+    await syncProfile(result.user);
   };
 
   const signUpWithEmail = async (email: string, password: string, name: string) => {
     const result = await createUserWithEmailAndPassword(auth, email, password);
     await updateProfile(result.user, { displayName: name });
-    await createOrUpdateUserProfile({
-      uid: result.user.uid,
-      email: result.user.email!,
-      displayName: name,
-      role: "user",
-    });
-    const profile = await getUserProfile(result.user.uid);
-    setUserProfile(profile);
+    await syncProfile(result.user, { displayName: name });
   };
 
   const logout = async () => {

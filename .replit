@@ -26,3 +26,19 @@ externalPort = 8080
 [[ports]]
 localPort = 8081
 externalPort = 80
+
+[[ports]]
+localPort = 24251
+externalPort = 3000
+
+[userenv]
+
+[userenv.shared]
+VITE_FIREBASE_API_KEY = "AIzaSyBVcFYDuJS5VkN3yGVXa-nERRTyQSi_Lyk"
+VITE_FIREBASE_AUTH_DOMAIN = "codetradehub.firebaseapp.com"
+VITE_FIREBASE_PROJECT_ID = "codetradehub"
+VITE_FIREBASE_STORAGE_BUCKET = "codetradehub.firebasestorage.app"
+VITE_FIREBASE_MESSAGING_SENDER_ID = "692540786910"
+VITE_FIREBASE_APP_ID = "1:692540786910:web:c289fe6d81bf74e2705a4f"
+VITE_WHATSAPP_NUMBER = "1234567890"
+VITE_STRIPE_PUBLISHABLE_KEY = "pk_test_placeholder"

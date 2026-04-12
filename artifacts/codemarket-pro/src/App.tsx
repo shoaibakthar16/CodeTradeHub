@@ -2,25 +2,51 @@ import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "./contexts/AuthContext";
+import { CartProvider } from "./contexts/CartContext";
 import NotFound from "@/pages/not-found";
 
-const queryClient = new QueryClient();
+// Pages
+import HomePage from "@/pages/HomePage";
+import ProductsPage from "@/pages/ProductsPage";
+import ProductDetailPage from "@/pages/ProductDetailPage";
+import CartPage from "@/pages/CartPage";
+import CheckoutPage from "@/pages/CheckoutPage";
+import SuccessPage from "@/pages/SuccessPage";
+import LoginPage from "@/pages/LoginPage";
+import DashboardPage from "@/pages/dashboard/DashboardPage";
+import DashboardDownloads from "@/pages/dashboard/DashboardDownloads";
+import DashboardOrders from "@/pages/dashboard/DashboardOrders";
+import AdminPage from "@/pages/admin/AdminPage";
+import AdminProducts from "@/pages/admin/AdminProducts";
+import AdminOrders from "@/pages/admin/AdminOrders";
+import AdminUsers from "@/pages/admin/AdminUsers";
+import AdminCoupons from "@/pages/admin/AdminCoupons";
+import AdminReviews from "@/pages/admin/AdminReviews";
+import AdminUploads from "@/pages/admin/AdminUploads";
 
-function Home() {
-  return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <h1 className="text-2xl font-bold text-gray-900">Replit Agent is building...</h1>
-        <p className="mt-2 text-sm text-gray-600">Your app will appear here once it's ready.</p>
-      </div>
-    </div>
-  );
-}
+const queryClient = new QueryClient();
 
 function Router() {
   return (
     <Switch>
-      <Route path="/" component={Home} />
+      <Route path="/" component={HomePage} />
+      <Route path="/products" component={ProductsPage} />
+      <Route path="/products/:slug" component={ProductDetailPage} />
+      <Route path="/cart" component={CartPage} />
+      <Route path="/checkout" component={CheckoutPage} />
+      <Route path="/success" component={SuccessPage} />
+      <Route path="/login" component={LoginPage} />
+      <Route path="/dashboard" component={DashboardPage} />
+      <Route path="/dashboard/downloads" component={DashboardDownloads} />
+      <Route path="/dashboard/orders" component={DashboardOrders} />
+      <Route path="/admin" component={AdminPage} />
+      <Route path="/admin/products" component={AdminProducts} />
+      <Route path="/admin/orders" component={AdminOrders} />
+      <Route path="/admin/users" component={AdminUsers} />
+      <Route path="/admin/coupons" component={AdminCoupons} />
+      <Route path="/admin/reviews" component={AdminReviews} />
+      <Route path="/admin/uploads" component={AdminUploads} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -29,12 +55,16 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Router />
-        </WouterRouter>
-        <Toaster />
-      </TooltipProvider>
+      <AuthProvider>
+        <CartProvider>
+          <TooltipProvider>
+            <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+              <Router />
+            </WouterRouter>
+            <Toaster />
+          </TooltipProvider>
+        </CartProvider>
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

@@ -1,0 +1,124 @@
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "wouter";
+import { Download, Package, ShoppingBag, User, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
+import { useAuth } from "@/contexts/AuthContext";
+import { getPurchasedProductIds, getProductById } from "@/lib/firestore";
+import { formatPrice } from "@/lib/stripe";
+import type { Product } from "@/types";
+
+export default function DashboardPage() {
+  const { user } = useAuth();
+  const [, setLocation] = useLocation();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!user) { setLocation("/login"); return; }
+    getPurchasedProductIds(user.uid).then(async (ids) => {
+      const fetched = await Promise.all(ids.map((id) => getProductById(id)));
+      setProducts(fetched.filter(Boolean) as Product[]);
+    }).finally(() => setLoading(false));
+  }, [user]);
+
+  if (!user) return null;
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <div className="flex-1 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h1 className="text-2xl font-bold">My Dashboard</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">Welcome back, {user.displayName || "User"}</p>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/dashboard/orders"><ShoppingBag className="w-4 h-4 mr-1.5" />Orders</Link>
+            </Button>
+            <Button variant="outline" size="sm" asChild>
+              <Link href="/dashboard/downloads"><Download className="w-4 h-4 mr-1.5" />Downloads</Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* Quick stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-10">
+          {[
+            { label: "Purchased Products", value: products.length, icon: Package },
+            { label: "Email", value: user.email?.split("@")[0] || "-", icon: User },
+          ].map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <div key={stat.label} className="rounded-lg border border-border bg-card p-4">
+                <Icon className="w-4 h-4 text-muted-foreground mb-2" />
+                <div className="font-bold text-xl">{stat.value}</div>
+                <div className="text-xs text-muted-foreground">{stat.label}</div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Purchased products */}
+        <h2 className="text-lg font-semibold mb-4">Your Products</h2>
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {[1, 2, 3].map((i) => <Skeleton key={i} className="h-28 rounded-lg" />)}
+          </div>
+        ) : products.length === 0 ? (
+          <div className="text-center py-16 border border-dashed border-border rounded-xl">
+            <Package className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+            <h3 className="text-base font-medium mb-2">No purchases yet</h3>
+            <p className="text-sm text-muted-foreground mb-4">Browse our products and make your first purchase.</p>
+            <Button asChild><Link href="/products">Browse Products</Link></Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {products.map((p) => (
+              <div key={p.id} className="flex items-center gap-4 p-4 rounded-lg border border-border bg-card" data-testid={`dashboard-product-${p.id}`}>
+                <div className="w-16 h-12 rounded overflow-hidden bg-muted shrink-0">
+                  {p.thumbnail ? (
+                    <img src={p.thumbnail} alt={p.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center">
+                      <span className="font-mono text-xs text-muted-foreground">&lt;/&gt;</span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-sm truncate">{p.title}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Badge variant="secondary" className="text-xs font-mono">v{p.version}</Badge>
+                    <span className="text-xs text-muted-foreground">{formatPrice(p.price)}</span>
+                  </div>
+                </div>
+                <div className="flex gap-1.5 shrink-0">
+                  {p.fileUrl && (
+                    <Button size="sm" variant="default" className="h-8 text-xs gap-1" asChild data-testid={`button-download-${p.id}`}>
+                      <a href={p.fileUrl} target="_blank" rel="noopener noreferrer" download>
+                        <Download className="w-3.5 h-3.5" /> Download
+                      </a>
+                    </Button>
+                  )}
+                  {p.demoUrl && (
+                    <Button size="sm" variant="outline" className="h-8 text-xs" asChild>
+                      <a href={p.demoUrl} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <Footer />
+    </div>
+  );
+}

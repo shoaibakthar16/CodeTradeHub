@@ -174,6 +174,16 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ── Featured Products (TOP) ── */}
+      {(loading || featured.length > 0) && (
+        <section className="py-14 border-b border-border bg-gradient-to-b from-amber-500/5 to-transparent">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <SectionHeader title="Featured Products" icon={Star} href="/products?sort=featured" color="text-amber-400" />
+            <ProductRow products={featured} loading={loading} />
+          </div>
+        </section>
+      )}
+
       {/* Latest Products */}
       <section className="py-14 border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -223,16 +233,6 @@ export default function HomePage() {
           </div>
         </section>
       ))}
-
-      {/* Featured Products */}
-      {(loading || featured.length > 0) && (
-        <section className="py-14 border-b border-border">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <SectionHeader title="Featured Products" icon={Star} href="/products" color="text-amber-400" />
-            <ProductRow products={featured} loading={loading} />
-          </div>
-        </section>
-      )}
 
       {/* Testimonials */}
       <section className="py-16 border-b border-border bg-card/20">

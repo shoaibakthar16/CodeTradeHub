@@ -15,7 +15,7 @@ export default function AdminReviews() {
 
   const load = () => {
     setLoading(true);
-    getAllReviews().then(setReviews).finally(() => setLoading(false));
+    getAllReviews().then(setReviews).catch(() => {}).finally(() => setLoading(false));
   };
   useEffect(load, []);
 

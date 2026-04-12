@@ -27,7 +27,7 @@ export default function AdminUploads() {
   const [fileUrl, setFileUrl] = useState("");
 
   useEffect(() => {
-    getProducts({ publishedOnly: false }).then(setProducts).finally(() => setLoading(false));
+    getProducts({ publishedOnly: false }).then(setProducts).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   const handleUpload = async () => {

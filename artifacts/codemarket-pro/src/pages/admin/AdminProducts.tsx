@@ -40,7 +40,7 @@ export default function AdminProducts() {
 
   const load = () => {
     setLoading(true);
-    getProducts({ publishedOnly: false }).then(setProducts).finally(() => setLoading(false));
+    getProducts({ publishedOnly: false }).then(setProducts).catch(() => {}).finally(() => setLoading(false));
   };
   useEffect(load, []);
 

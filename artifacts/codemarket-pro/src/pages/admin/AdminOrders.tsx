@@ -24,7 +24,7 @@ export default function AdminOrders() {
 
   const load = () => {
     setLoading(true);
-    getAllOrders().then(setOrders).finally(() => setLoading(false));
+    getAllOrders().then(setOrders).catch(() => {}).finally(() => setLoading(false));
   };
   useEffect(load, []);
 

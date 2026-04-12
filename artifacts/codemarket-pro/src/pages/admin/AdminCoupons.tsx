@@ -33,7 +33,7 @@ export default function AdminCoupons() {
 
   const load = () => {
     setLoading(true);
-    getAllCoupons().then(setCoupons).finally(() => setLoading(false));
+    getAllCoupons().then(setCoupons).catch(() => {}).finally(() => setLoading(false));
   };
   useEffect(load, []);
 

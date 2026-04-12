@@ -24,7 +24,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getDashboardStats().then(setStats).finally(() => setLoading(false));
+    getDashboardStats().then(setStats).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
   const statCards = stats ? [

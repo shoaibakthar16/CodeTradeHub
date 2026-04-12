@@ -17,7 +17,7 @@ export default function AdminUsers() {
 
   const load = () => {
     setLoading(true);
-    getAllUsers().then(setUsers).finally(() => setLoading(false));
+    getAllUsers().then(setUsers).catch(() => {}).finally(() => setLoading(false));
   };
   useEffect(load, []);
 

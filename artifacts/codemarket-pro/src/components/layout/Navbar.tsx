@@ -37,10 +37,11 @@ export default function Navbar() {
     : "U";
 
   const navLinkClass = (href: string) =>
-    `text-sm transition-colors ${location === href ? "text-foreground font-medium" : "text-muted-foreground hover:text-foreground"}`;
+    `text-sm transition-all ${location === href ? "text-foreground font-medium bg-white/6 shadow-inner" : "text-muted-foreground hover:text-foreground hover:bg-white/4"}`;
 
   return (
-    <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
+    <nav className="sticky top-0 z-50 border-b border-border bg-background/90 backdrop-blur-lg shadow-[0_1px_0_0_hsl(var(--border))]">
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent pointer-events-none" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}

@@ -12,30 +12,30 @@ import { getProducts } from "@/lib/firestore";
 import type { Product } from "@/types";
 
 const CATEGORIES = [
-  { label: "Website Templates", slug: "templates", icon: Layers, color: "text-violet-400" },
-  { label: "SaaS Starter Kits", slug: "saas", icon: Zap, color: "text-yellow-400" },
-  { label: "Mobile Apps", slug: "mobile", icon: Smartphone, color: "text-cyan-400" },
-  { label: "Admin Panels", slug: "admin-panels", icon: Shield, color: "text-green-400" },
-  { label: "E-Commerce", slug: "ecommerce", icon: ShoppingBag, color: "text-pink-400" },
-  { label: "Full-Stack Apps", slug: "fullstack", icon: Code2, color: "text-orange-400" },
-  { label: "WordPress Templates", slug: "wordpress", icon: Globe, color: "text-blue-400" },
-  { label: "Blogger Templates", slug: "blogger", icon: BookOpen, color: "text-orange-300" },
-  { label: "Shopify Templates", slug: "shopify", icon: Store, color: "text-green-300" },
-  { label: "Browser Extensions", slug: "extensions", icon: Puzzle, color: "text-rose-400" },
+  { label: "Website Templates", slug: "templates", icon: Layers, color: "text-violet-400", bg: "bg-violet-500/10 group-hover:bg-violet-500/20" },
+  { label: "SaaS Starter Kits", slug: "saas", icon: Zap, color: "text-yellow-400", bg: "bg-yellow-500/10 group-hover:bg-yellow-500/20" },
+  { label: "Mobile Apps", slug: "mobile", icon: Smartphone, color: "text-cyan-400", bg: "bg-cyan-500/10 group-hover:bg-cyan-500/20" },
+  { label: "Admin Panels", slug: "admin-panels", icon: Shield, color: "text-green-400", bg: "bg-green-500/10 group-hover:bg-green-500/20" },
+  { label: "E-Commerce", slug: "ecommerce", icon: ShoppingBag, color: "text-pink-400", bg: "bg-pink-500/10 group-hover:bg-pink-500/20" },
+  { label: "Full-Stack Apps", slug: "fullstack", icon: Code2, color: "text-orange-400", bg: "bg-orange-500/10 group-hover:bg-orange-500/20" },
+  { label: "WordPress Templates", slug: "wordpress", icon: Globe, color: "text-blue-400", bg: "bg-blue-500/10 group-hover:bg-blue-500/20" },
+  { label: "Blogger Templates", slug: "blogger", icon: BookOpen, color: "text-orange-300", bg: "bg-orange-400/10 group-hover:bg-orange-400/20" },
+  { label: "Shopify Templates", slug: "shopify", icon: Store, color: "text-green-300", bg: "bg-green-400/10 group-hover:bg-green-400/20" },
+  { label: "Browser Extensions", slug: "extensions", icon: Puzzle, color: "text-rose-400", bg: "bg-rose-500/10 group-hover:bg-rose-500/20" },
 ];
 
 function SectionHeader({ title, icon: Icon, href, color }: { title: string; icon: React.ElementType; href: string; color?: string }) {
   return (
     <div className="flex items-center justify-between mb-6">
-      <div className="flex items-center gap-2.5">
-        <div className={`p-1.5 rounded-md bg-white/5 ${color || "text-primary"}`}>
+      <div className="flex items-center gap-3">
+        <div className={`p-2 rounded-lg bg-white/5 border border-white/8 ${color || "text-primary"}`}>
           <Icon className="w-4 h-4" />
         </div>
-        <h2 className="text-lg font-semibold">{title}</h2>
+        <h2 className="text-lg font-bold tracking-tight">{title}</h2>
       </div>
-      <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
+      <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground gap-1 text-xs">
         <Link href={href}>
-          View all <ArrowRight className="ml-1 w-3.5 h-3.5" />
+          View all <ArrowRight className="w-3.5 h-3.5" />
         </Link>
       </Button>
     </div>
@@ -97,43 +97,91 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="relative border-b border-border overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-accent/5 pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-36">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-6">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              <span className="text-xs font-mono text-primary">Premium Source Code Marketplace</span>
+        {/* Background layers */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,hsl(250_90%_64%/0.15),transparent)] pointer-events-none" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-primary/8 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-cyan-500/6 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute inset-0 bg-[linear-gradient(hsl(var(--border)/0.4)_1px,transparent_1px),linear-gradient(90deg,hsl(var(--border)/0.4)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_60%_60%_at_50%_0%,black,transparent)] pointer-events-none opacity-40" />
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-28">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+
+            {/* Left — Content */}
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-6">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                <span className="text-xs font-mono text-primary">Premium Source Code Marketplace</span>
+              </div>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.1] mb-6">
+                Buy & Sell{" "}
+                <span className="bg-gradient-to-r from-primary via-violet-400 to-cyan-400 bg-clip-text text-transparent">
+                  Source Code
+                </span>{" "}
+                for Your Next Project
+              </h1>
+              <p className="text-base md:text-lg text-muted-foreground mb-8 max-w-lg leading-relaxed">
+                Skip the weeks of boilerplate. Get production-ready website templates, SaaS kits, and full app source code — built by developers, for developers.
+              </p>
+              <div className="flex flex-wrap items-center gap-3 mb-10">
+                <Button size="lg" asChild className="shadow-lg shadow-primary/25 hover:shadow-primary/35 hover:-translate-y-px transition-all" data-testid="button-browse-products">
+                  <Link href="/products">
+                    Browse Products <ArrowRight className="ml-2 w-4 h-4" />
+                  </Link>
+                </Button>
+                <Button size="lg" variant="outline" asChild className="hover:-translate-y-px transition-all">
+                  <Link href="/login">Start Selling</Link>
+                </Button>
+              </div>
+
+              {/* Stats */}
+              <div className="flex items-center gap-0 divide-x divide-border rounded-xl border border-border bg-white/2 overflow-hidden w-fit">
+                {[
+                  { value: "100+", label: "Products", icon: "📦" },
+                  { value: "50+", label: "Categories", icon: "🗂️" },
+                  { value: "Secure", label: "Payments", icon: "🔒" },
+                ].map((stat) => (
+                  <div key={stat.label} className="px-4 py-3 text-center">
+                    <div className="text-base font-bold">{stat.value}</div>
+                    <div className="text-[11px] text-muted-foreground">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight mb-6">
-              Buy & Sell{" "}
-              <span className="text-primary">Source Code</span>{" "}
-              for Your Next Project
-            </h1>
-            <p className="text-lg text-muted-foreground mb-8 max-w-xl">
-              Skip the weeks of boilerplate. Get production-ready website templates, SaaS kits, and full app source code — built by developers, for developers.
-            </p>
-            <div className="flex flex-wrap items-center gap-3">
-              <Button size="lg" asChild data-testid="button-browse-products">
-                <Link href="/products">
-                  Browse Products <ArrowRight className="ml-2 w-4 h-4" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link href="/login">Start Selling</Link>
-              </Button>
-            </div>
-            <div className="flex items-center gap-6 mt-10">
+
+            {/* Right — Decorative cards (desktop only) */}
+            <div className="hidden lg:flex flex-col items-end gap-4 relative">
+              {/* Glow behind cards */}
+              <div className="absolute inset-0 bg-primary/5 rounded-3xl blur-2xl" />
+
               {[
-                { value: "100+", label: "Source Files" },
-                { value: "50+", label: "Categories" },
-                { value: "Test Mode", label: "Secure Payments" },
-              ].map((stat) => (
-                <div key={stat.label}>
-                  <div className="font-bold text-lg">{stat.value}</div>
-                  <div className="text-xs text-muted-foreground">{stat.label}</div>
+                { title: "SaaS Starter Kit", cat: "SaaS", price: "$49", gradient: "from-violet-500/20 to-indigo-500/10", badge: "text-violet-400 bg-violet-500/10", stars: 5 },
+                { title: "E-Commerce Template", cat: "E-Commerce", price: "$29", gradient: "from-cyan-500/20 to-blue-500/10", badge: "text-cyan-400 bg-cyan-500/10", stars: 4 },
+                { title: "Mobile App UI Kit", cat: "Mobile", price: "$39", gradient: "from-pink-500/20 to-rose-500/10", badge: "text-pink-400 bg-pink-500/10", stars: 5 },
+              ].map((card, i) => (
+                <div
+                  key={card.title}
+                  className="relative w-72 rounded-2xl border border-white/8 bg-card/80 backdrop-blur overflow-hidden shadow-xl"
+                  style={{ transform: `translateX(${i % 2 === 1 ? "-24px" : "0"})` }}
+                >
+                  <div className={`h-28 bg-gradient-to-br ${card.gradient} flex items-center justify-center`}>
+                    <Code2 className="w-10 h-10 text-white/20" />
+                  </div>
+                  <div className="p-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${card.badge}`}>{card.cat}</span>
+                      <span className="text-sm font-bold text-primary">{card.price}</span>
+                    </div>
+                    <p className="text-xs font-medium">{card.title}</p>
+                    <div className="flex gap-0.5 mt-1.5">
+                      {Array.from({ length: card.stars }).map((_, s) => (
+                        <Star key={s} className="w-2.5 h-2.5 fill-amber-400 text-amber-400" />
+                      ))}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
+
           </div>
         </div>
       </section>
@@ -154,10 +202,12 @@ export default function HomePage() {
               return (
                 <Link key={cat.slug} href={`/products?category=${cat.slug}`}>
                   <div
-                    className="flex flex-col items-center gap-1.5 p-2 sm:p-4 rounded-xl border border-border bg-card hover:border-primary/40 hover:bg-primary/5 transition-all cursor-pointer group"
+                    className="flex flex-col items-center gap-1.5 p-2 sm:p-4 rounded-xl border border-border bg-card hover:border-white/10 hover:bg-white/3 transition-all cursor-pointer group"
                     data-testid={`link-category-${cat.slug}`}
                   >
-                    <Icon className={`w-5 h-5 sm:w-6 sm:h-6 ${cat.color} group-hover:scale-110 transition-transform`} />
+                    <div className={`p-1.5 sm:p-2 rounded-lg transition-colors ${cat.bg}`}>
+                      <Icon className={`w-4 h-4 sm:w-5 sm:h-5 ${cat.color} group-hover:scale-110 transition-transform`} />
+                    </div>
                     <span className="text-[10px] sm:text-xs text-center text-muted-foreground group-hover:text-foreground transition-colors font-medium leading-tight">
                       {cat.label}
                     </span>

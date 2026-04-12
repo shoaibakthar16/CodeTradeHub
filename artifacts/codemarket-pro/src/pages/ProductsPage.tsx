@@ -77,11 +77,18 @@ export default function ProductsPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
       <div className="flex-1">
-        <div className="border-b border-border bg-card/20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <h1 className="text-2xl font-bold mb-1">Source Code Products</h1>
-            <p className="text-sm text-muted-foreground">
-              {loading ? "Loading..." : `${filtered.length} product${filtered.length !== 1 ? "s" : ""} available`}
+        <div className="relative border-b border-border overflow-hidden">
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_80%_at_50%_0%,hsl(250_90%_64%/0.08),transparent)] pointer-events-none" />
+          <div className="absolute inset-0 bg-[linear-gradient(hsl(var(--border)/0.3)_1px,transparent_1px),linear-gradient(90deg,hsl(var(--border)/0.3)_1px,transparent_1px)] bg-[size:48px_48px] [mask-image:radial-gradient(ellipse_80%_100%_at_50%_0%,black,transparent)] pointer-events-none opacity-30" />
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="p-2 rounded-lg bg-primary/10 border border-primary/20">
+                <Package className="w-4 h-4 text-primary" />
+              </div>
+              <h1 className="text-2xl font-bold tracking-tight">Source Code Products</h1>
+            </div>
+            <p className="text-sm text-muted-foreground ml-11">
+              {loading ? "Loading products…" : `${filtered.length} product${filtered.length !== 1 ? "s" : ""} available`}
             </p>
           </div>
         </div>

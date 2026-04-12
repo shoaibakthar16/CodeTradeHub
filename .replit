@@ -14,6 +14,7 @@ runButton = "Project"
 [agent]
 stack = "PNPM_WORKSPACE"
 expertMode = true
+integrations = ["github:1.0.0"]
 
 [postMerge]
 path = "scripts/post-merge.sh"
@@ -49,3 +50,6 @@ VITE_FIREBASE_STORAGE_BUCKET = "codetradehub.firebasestorage.app"
 VITE_FIREBASE_MESSAGING_SENDER_ID = "692540786910"
 VITE_FIREBASE_APP_ID = "1:692540786910:web:c289fe6d81bf74e2705a4f"
 VITE_STRIPE_PUBLISHABLE_KEY = "pk_test_placeholder"
+
+[nix]
+channel = "stable-25_05"

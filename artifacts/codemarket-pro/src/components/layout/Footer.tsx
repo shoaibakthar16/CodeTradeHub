@@ -10,7 +10,7 @@ export default function Footer() {
             <Link href="/" className="flex items-center gap-2 mb-4">
               <img src="/logo.png" alt="CodeTradeHub" className="w-7 h-7 rounded-lg object-cover" />
               <span className="font-bold tracking-tight">
-                <span className="text-foreground">Code</span><span className="text-blue-500">TradeHub</span>
+                <span className="text-foreground">Code</span><span className="text-primary">TradeHub</span>
               </span>
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs">

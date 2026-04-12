@@ -92,7 +92,7 @@ export default function LoginPage() {
         <Link href="/" className="flex items-center gap-2">
           <img src="/logo.png" alt="CodeTradeHub" className="w-8 h-8 rounded-lg object-cover" />
           <span className="font-bold tracking-tight">
-            <span className="text-foreground">Code</span><span className="text-blue-500">TradeHub</span>
+            <span className="text-foreground">Code</span><span className="text-primary">TradeHub</span>
           </span>
         </Link>
         <div>
@@ -103,7 +103,7 @@ export default function LoginPage() {
             <img src="/logo.png" alt="CodeTradeHub" className="w-10 h-10 rounded-xl object-cover" />
             <div>
               <div className="text-sm font-medium">
-                <span className="text-foreground">Code</span><span className="text-blue-500">TradeHub</span>
+                <span className="text-foreground">Code</span><span className="text-primary">TradeHub</span>
               </div>
               <div className="text-xs text-muted-foreground">Premium Source Code Marketplace</div>
             </div>
@@ -121,7 +121,7 @@ export default function LoginPage() {
             <Link href="/" className="flex items-center gap-2">
               <img src="/logo.png" alt="CodeTradeHub" className="w-7 h-7 rounded-lg object-cover" />
               <span className="font-bold">
-                <span className="text-foreground">Code</span><span className="text-blue-500">TradeHub</span>
+                <span className="text-foreground">Code</span><span className="text-primary">TradeHub</span>
               </span>
             </Link>
           </div>

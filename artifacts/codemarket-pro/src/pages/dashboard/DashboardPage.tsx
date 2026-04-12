@@ -74,39 +74,45 @@ service cloud.firestore {
           </div>
         )}
         {/* Header */}
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-2xl font-bold">My Dashboard</h1>
-            <p className="text-sm text-muted-foreground mt-0.5">Welcome back, {user.displayName || "User"}</p>
+        <div className="mb-8">
+          <div className="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <h1 className="text-2xl font-bold">My Dashboard</h1>
+              <p className="text-sm text-muted-foreground mt-0.5">Welcome back, {user.displayName || "User"}</p>
+            </div>
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" asChild>
+          {/* Tab nav — scrolls horizontally on small screens */}
+          <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+            <Button variant="outline" size="sm" className="shrink-0" asChild>
               <Link href="/dashboard/orders"><ShoppingBag className="w-4 h-4 mr-1.5" />Orders</Link>
             </Button>
-            <Button variant="outline" size="sm" asChild>
+            <Button variant="outline" size="sm" className="shrink-0" asChild>
               <Link href="/dashboard/downloads"><Download className="w-4 h-4 mr-1.5" />Downloads</Link>
             </Button>
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/dashboard/wishlist"><Heart className="w-4 h-4 mr-1.5 text-rose-400" />Wishlist {wishlistCount > 0 && <span className="ml-1 text-xs bg-rose-500 text-white rounded-full px-1.5 py-0.5">{wishlistCount}</span>}</Link>
+            <Button variant="outline" size="sm" className="shrink-0" asChild>
+              <Link href="/dashboard/wishlist">
+                <Heart className="w-4 h-4 mr-1.5 text-rose-400" />
+                Wishlist
+                {wishlistCount > 0 && (
+                  <span className="ml-1.5 text-xs bg-rose-500 text-white rounded-full px-1.5 py-0.5 leading-none">{wishlistCount}</span>
+                )}
+              </Link>
             </Button>
           </div>
         </div>
 
         {/* Quick stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-10">
-          {[
-            { label: "Purchased Products", value: products.length, icon: Package },
-            { label: "Email", value: user.email?.split("@")[0] || "-", icon: User },
-          ].map((stat) => {
-            const Icon = stat.icon;
-            return (
-              <div key={stat.label} className="rounded-lg border border-border bg-card p-4">
-                <Icon className="w-4 h-4 text-muted-foreground mb-2" />
-                <div className="font-bold text-xl">{stat.value}</div>
-                <div className="text-xs text-muted-foreground">{stat.label}</div>
-              </div>
-            );
-          })}
+        <div className="grid grid-cols-2 gap-4 mb-10">
+          <div className="rounded-lg border border-border bg-card p-4">
+            <Package className="w-4 h-4 text-muted-foreground mb-2" />
+            <div className="font-bold text-xl">{products.length}</div>
+            <div className="text-xs text-muted-foreground">Purchased Products</div>
+          </div>
+          <div className="rounded-lg border border-border bg-card p-4 min-w-0">
+            <User className="w-4 h-4 text-muted-foreground mb-2" />
+            <div className="font-bold text-sm truncate" title={user.email || ""}>{user.email || "-"}</div>
+            <div className="text-xs text-muted-foreground">Email</div>
+          </div>
         </div>
 
         {/* Purchased products */}

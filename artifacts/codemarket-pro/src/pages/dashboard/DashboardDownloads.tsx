@@ -49,39 +49,41 @@ export default function DashboardDownloads() {
         ) : (
           <div className="space-y-3">
             {products.map((p) => (
-              <div key={p.id} className="flex items-center gap-4 p-5 rounded-lg border border-border bg-card" data-testid={`download-item-${p.id}`}>
-                <div className="w-14 h-10 rounded overflow-hidden bg-muted shrink-0">
-                  {p.thumbnail ? (
-                    <img src={p.thumbnail} alt={p.title} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <Package className="w-4 h-4 text-muted-foreground" />
+              <div key={p.id} className="p-4 rounded-lg border border-border bg-card" data-testid={`download-item-${p.id}`}>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-9 rounded overflow-hidden bg-muted shrink-0">
+                    {p.thumbnail ? (
+                      <img src={p.thumbnail} alt={p.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Package className="w-4 h-4 text-muted-foreground" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-sm truncate">{p.title}</p>
+                    <div className="flex flex-wrap items-center gap-1.5 mt-0.5">
+                      <Badge variant="secondary" className="text-xs font-mono">v{p.version}</Badge>
+                      {p.fileName && <span className="text-xs text-muted-foreground font-mono truncate max-w-[160px]">{p.fileName}</span>}
                     </div>
-                  )}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm">{p.title}</p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <Badge variant="secondary" className="text-xs font-mono">v{p.version}</Badge>
-                    {p.fileName && <span className="text-xs text-muted-foreground font-mono">{p.fileName}</span>}
                   </div>
                 </div>
-                <div className="flex gap-2 shrink-0">
+                <div className="flex gap-2">
                   {p.docsUrl && (
-                    <Button size="sm" variant="outline" className="h-8 text-xs gap-1" asChild>
+                    <Button size="sm" variant="outline" className="h-8 text-xs gap-1 flex-1 sm:flex-none" asChild>
                       <a href={p.docsUrl} target="_blank" rel="noopener noreferrer">
                         Docs <ExternalLink className="w-3 h-3" />
                       </a>
                     </Button>
                   )}
                   {p.fileUrl ? (
-                    <Button size="sm" className="h-8 text-xs gap-1.5" asChild data-testid={`button-download-file-${p.id}`}>
+                    <Button size="sm" className="h-8 text-xs gap-1.5 flex-1 sm:flex-none" asChild data-testid={`button-download-file-${p.id}`}>
                       <a href={p.fileUrl} target="_blank" rel="noopener noreferrer" download={p.fileName}>
                         <Download className="w-3.5 h-3.5" /> Download ZIP
                       </a>
                     </Button>
                   ) : (
-                    <Button size="sm" variant="secondary" className="h-8 text-xs" disabled>
+                    <Button size="sm" variant="secondary" className="h-8 text-xs flex-1 sm:flex-none" disabled>
                       File not available
                     </Button>
                   )}

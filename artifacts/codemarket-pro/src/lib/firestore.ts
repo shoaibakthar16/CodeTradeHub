@@ -281,6 +281,25 @@ export async function getCouponByCode(code: string): Promise<Coupon | null> {
   };
 }
 
+export async function getAnnouncementCoupon(): Promise<Coupon | null> {
+  const q = query(
+    collection(db, "coupons"),
+    where("showInAnnouncement", "==", true),
+    where("active", "==", true),
+    limit(1)
+  );
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+  const d = snap.docs[0];
+  const data = d.data();
+  return {
+    ...(data as Omit<Coupon, "id" | "createdAt" | "expiresAt">),
+    id: d.id,
+    createdAt: toDate(data.createdAt),
+    expiresAt: toDate(data.expiresAt),
+  };
+}
+
 export async function getAllCoupons(): Promise<Coupon[]> {
   const snap = await getDocs(collection(db, "coupons"));
   return snap.docs

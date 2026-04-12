@@ -80,6 +80,7 @@ export interface Coupon {
   expiresAt: Date | string;
   active: boolean;
   createdAt: Date | string;
+  showInAnnouncement?: boolean;
 }
 
 export interface CartItem {

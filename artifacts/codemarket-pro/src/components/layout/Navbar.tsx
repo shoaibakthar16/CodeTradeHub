@@ -97,9 +97,6 @@ export default function Navbar() {
                     : "text-muted-foreground hover:text-white"
                 }`}
               >
-                {isActive(href) && (
-                  <span className="absolute inset-0 rounded-lg bg-white/8 ring-1 ring-white/10" />
-                )}
                 <span className="relative">{label}</span>
                 {isActive(href) && (
                   <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-gradient-to-r from-primary to-cyan-400" />
@@ -141,9 +138,6 @@ export default function Navbar() {
                     : "text-muted-foreground hover:text-white"
                 }`}
               >
-                {location.startsWith("/admin") && (
-                  <span className="absolute inset-0 rounded-lg bg-white/8 ring-1 ring-white/10" />
-                )}
                 <span className="relative flex items-center gap-1.5">
                   <Shield className="w-3.5 h-3.5 text-primary" /> Admin
                 </span>

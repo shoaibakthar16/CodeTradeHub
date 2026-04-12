@@ -1,5 +1,5 @@
 import { Link } from "wouter";
-import { Code2, Github, Twitter } from "lucide-react";
+import { Github, Twitter } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -8,9 +8,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="w-7 h-7 rounded bg-primary flex items-center justify-center">
-                <Code2 className="w-4 h-4 text-primary-foreground" />
-              </div>
+              <img src="/logo.png" alt="CodeTradeHub" className="w-7 h-7 rounded-lg object-cover" />
               <span className="font-bold tracking-tight">CodeTradeHub</span>
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs">

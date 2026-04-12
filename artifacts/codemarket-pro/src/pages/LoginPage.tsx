@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { Code2, Chrome, Eye, EyeOff } from "lucide-react";
+import { Chrome, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -90,9 +90,7 @@ export default function LoginPage() {
       {/* Left panel */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-12 bg-gradient-to-br from-primary/20 to-accent/10 border-r border-border">
         <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded bg-primary flex items-center justify-center">
-            <Code2 className="w-5 h-5 text-primary-foreground" />
-          </div>
+          <img src="/logo.png" alt="CodeTradeHub" className="w-8 h-8 rounded-lg object-cover" />
           <span className="font-bold tracking-tight">CodeTradeHub</span>
         </Link>
         <div>
@@ -100,9 +98,7 @@ export default function LoginPage() {
             "Stop building from scratch. Buy production-ready code and ship in days, not months."
           </blockquote>
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center font-mono text-sm font-bold">
-              CT
-            </div>
+            <img src="/logo.png" alt="CodeTradeHub" className="w-10 h-10 rounded-xl object-cover" />
             <div>
               <div className="text-sm font-medium">CodeTradeHub</div>
               <div className="text-xs text-muted-foreground">Premium Source Code Marketplace</div>
@@ -119,9 +115,7 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           <div className="lg:hidden mb-8">
             <Link href="/" className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded bg-primary flex items-center justify-center">
-                <Code2 className="w-4 h-4 text-primary-foreground" />
-              </div>
+              <img src="/logo.png" alt="CodeTradeHub" className="w-7 h-7 rounded-lg object-cover" />
               <span className="font-bold">CodeTradeHub</span>
             </Link>
           </div>

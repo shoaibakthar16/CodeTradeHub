@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "q8w0hbga7f4Jx-piUeC46"
+uri = "file://artifacts/codemarket-pro/public/logo.png"
+type = "image"
+title = "codetradehub premium logo icon"

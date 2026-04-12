@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "CodeMarket Pro"
+version = "1.0.0"
+id = "artifacts/codemarket-pro"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24251
+
+[services.development]
+run = "pnpm --filter @workspace/codemarket-pro run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/codemarket-pro", "run", "build" ]
+publicDir = "artifacts/codemarket-pro/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24251"
+BASE_PATH = "/"

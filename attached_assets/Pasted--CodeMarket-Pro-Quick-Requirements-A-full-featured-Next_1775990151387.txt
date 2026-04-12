@@ -1,0 +1,238 @@
+🤖 CodeMarket Pro – Quick Requirements
+
+A full-featured Next.js digital product store where you upload website/app source code, users buy online, then access downloads inside their dashboard. It also includes a WhatsApp order option for buyers who cannot complete online payment. The stack below fits well because Next.js App Router supports modern routing and server features, Auth.js handles Next.js authentication, Stripe Checkout + webhooks fits paid digital delivery, and Supabase gives you database, auth, and storage in one backend.
+
+🏗️ Tech Stack
+
+Frontend
+
+Next.js 16+ with App Router
+TypeScript
+Tailwind CSS
+shadcn/ui for clean admin/store UI
+
+Backend
+
+Next.js Route Handlers / Server Actions for checkout, webhooks, admin actions, secure download generation
+Supabase Postgres for products, orders, users, downloads, coupons, reviews
+Supabase Storage or Vercel Blob private storage for ZIP source-code files
+
+Authentication
+
+Auth.js for login/session management
+Social login with Google
+Email/password optional for admin and backup login
+
+Payments
+
+Stripe Checkout for online payment
+Stripe Webhooks to mark order paid and unlock dashboard downloads
+WhatsApp manual order flow using wa.me link for customers who want to contact you before paying
+
+Email / Notifications
+
+Resend for order confirmation, invoice email, and download-ready email
+Optional admin alert when a WhatsApp/manual order is submitted
+
+Deployment
+
+Vercel for the Next.js app
+Supabase for backend services
+
+This is the easiest “full product” path because it gives you strong digital-delivery control without needing a large custom backend. Next.js App Router is file-system based and supports route handlers, Auth.js is the current Next.js-oriented auth path, Supabase combines Postgres/Auth/Storage, Stripe Checkout redirects users to a hosted payment page, Stripe webhooks notify your app when checkout is completed, and WhatsApp supports click-to-chat links via wa.me/<number>.
+
+🔑 Environment Variables
+NEXT_PUBLIC_APP_URL=
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+
+AUTH_SECRET=
+AUTH_GOOGLE_ID=
+AUTH_GOOGLE_SECRET=
+
+STRIPE_SECRET_KEY=
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
+STRIPE_WEBHOOK_SECRET=
+
+RESEND_API_KEY=
+ORDER_FROM_EMAIL=
+
+NEXT_PUBLIC_WHATSAPP_NUMBER=
+
+BLOB_READ_WRITE_TOKEN=   # if using Vercel Blob
+
+AUTH_SECRET is recommended by Auth.js for cookie/token security, Stripe needs secret and webhook keys for Checkout + event verification, and Resend uses an API key for sending transactional email.
+
+📁 File Structure
+codemarket-pro/
+├── app/
+│   ├── (store)/
+│   │   ├── page.tsx
+│   │   ├── products/
+│   │   │   ├── page.tsx
+│   │   │   └── [slug]/page.tsx
+│   │   ├── categories/[slug]/page.tsx
+│   │   ├── cart/page.tsx
+│   │   ├── checkout/page.tsx
+│   │   └── success/page.tsx
+│   ├── dashboard/
+│   │   ├── page.tsx
+│   │   ├── downloads/page.tsx
+│   │   ├── orders/page.tsx
+│   │   ├── profile/page.tsx
+│   │   └── reviews/page.tsx
+│   ├── admin/
+│   │   ├── page.tsx
+│   │   ├── products/page.tsx
+│   │   ├── orders/page.tsx
+│   │   ├── uploads/page.tsx
+│   │   ├── coupons/page.tsx
+│   │   └── users/page.tsx
+│   ├── api/
+│   │   ├── auth/[...nextauth]/route.ts
+│   │   ├── checkout/route.ts
+│   │   ├── stripe/webhook/route.ts
+│   │   ├── downloads/[orderId]/route.ts
+│   │   ├── whatsapp-order/route.ts
+│   │   ├── products/route.ts
+│   │   └── reviews/route.ts
+│   ├── login/page.tsx
+│   └── register/page.tsx
+├── components/
+│   ├── ui/
+│   ├── store/
+│   ├── dashboard/
+│   ├── admin/
+│   └── shared/
+├── lib/
+│   ├── auth.ts
+│   ├── stripe.ts
+│   ├── supabase.ts
+│   ├── email.ts
+│   ├── storage.ts
+│   ├── permissions.ts
+│   └── utils.ts
+├── actions/
+│   ├── checkout.ts
+│   ├── orders.ts
+│   ├── products.ts
+│   ├── reviews.ts
+│   └── coupons.ts
+├── db/
+│   ├── schema.sql
+│   ├── policies.sql
+│   └── seed.sql
+├── types/
+│   ├── product.ts
+│   ├── order.ts
+│   ├── user.ts
+│   └── review.ts
+├── public/
+└── middleware.ts
+
+This structure follows Next.js App Router conventions, where routes come from folders/files and custom handlers can live in route.ts.
+
+🎯 Core Features
+1. Product Catalog for Source Code
+
+You can add digital products such as website templates, full apps, admin panels, SaaS starter kits, and mobile app source code. Each product should have title, slug, thumbnail, preview images, description, tech stack, features, version, documentation info, demo link, price, discount, category, tags, and file attachment.
+
+2. Secure Online Checkout
+
+Users can add products to cart and pay using Stripe Checkout. After successful payment, your app receives a webhook event and marks the order as paid. That unlocks the product in the user dashboard. Stripe documents Checkout Sessions and checkout.session.completed webhooks specifically for this payment flow.
+
+3. Auto Account + Dashboard Access
+
+If the buyer is not already logged in, the checkout form should collect name, email, and purchase details. After payment, the system should create or connect the user account by email and send the user into a dashboard where purchased files are visible. Auth.js supports Next.js sessions and route protection; protected resources can be checked server-side.
+
+4. Download Center for Purchased Files
+
+Inside the dashboard, users can see purchased products, version numbers, documentation, changelog, and a secure download button. Files should not be public. Store the ZIP files in Supabase Storage with restricted access or in Vercel Blob private storage, then generate access only for buyers with a valid paid order. Supabase Storage supports fine-grained access controls, and Vercel Blob has private storage for authenticated access.
+
+5. WhatsApp Purchase Option
+
+Some users may not want to pay online immediately. Each product page should have a Buy on WhatsApp button that opens a prefilled WhatsApp message including product name and price. WhatsApp supports click-to-chat and wa.me/<number> links without requiring the number to be saved.
+
+6. Admin Dashboard
+
+You need an admin panel to:
+
+upload source-code ZIP files
+create/edit/delete products
+manage prices and discounts
+approve manual/WhatsApp orders
+see customers and order history
+resend download email
+create coupons
+manage reviews and product visibility
+🔌 APIs & Tools
+Stripe — payment checkout and webhook confirmation for paid orders. Good fit for digital product checkout.
+Supabase — database, auth, and storage in one service. Useful for users, products, orders, and protected files.
+Auth.js — authentication and session handling in Next.js.
+Resend — transactional emails for receipts and download-ready emails.
+WhatsApp Click-to-Chat — simple manual sales channel using wa.me.
+Vercel Blob — optional private file storage for digital ZIP files. Use only if you prefer Vercel-native storage instead of Supabase Storage.
+🧠 Key States
+
+Useful React/Next states for this project:
+
+products
+selectedProduct
+cartItems
+checkoutLoading
+paymentStatus
+currentUser
+isLoggedIn
+userOrders
+purchasedProducts
+downloadLoading
+adminProducts
+adminOrders
+couponCode
+discountAmount
+whatsappModalOpen
+searchQuery
+selectedCategory
+sortOption
+reviewForm
+🚀 User Flow
+User opens home page and browses code products.
+User clicks a product and sees details, screenshots, demo link, tech stack, and price.
+User chooses either:
+Buy Now
+Buy via WhatsApp
+For online purchase:
+user fills name, email, and required details
+app creates Stripe Checkout Session
+user pays on Stripe hosted page
+Stripe sends webhook to your app
+app saves paid order in database
+app creates or links user account by email
+user is redirected to success page
+user enters dashboard and sees purchased source code
+user downloads ZIP file and can also receive email confirmation
+For WhatsApp purchase:
+user clicks button
+WhatsApp opens with prefilled product/order message
+you manually confirm payment
+admin marks order as paid
+product becomes available in user dashboard
+✅ Must-Have Features
+ Product listing page
+ Product details page
+ Secure online payment
+ Auto account creation or email-based account linking after purchase
+ User dashboard with purchased products
+ Protected source code downloads
+ WhatsApp buy option
+ Admin dashboard
+ Coupon/discount support
+ Order history
+ Email confirmation
+ Reviews and ratings
+ Search, category, and filtering
+ Documentation/demo links per product
+📝 Result Summary
+
+A Next.js digital source-code marketplace where customers can browse products, pay online or contact via WhatsApp, and then access purchased website/app source code securely from their dashboard.

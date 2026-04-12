@@ -11,15 +11,22 @@ import type { UserProfile } from "@/types";
 
 export default function AdminUsers() {
   const { toast } = useToast();
-  const { user: currentUser } = useAuth();
+  const { user: currentUser, userProfile } = useAuth();
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
 
   const load = () => {
     setLoading(true);
-    getAllUsers().then(setUsers).catch(() => {}).finally(() => setLoading(false));
+    getAllUsers()
+      .then(setUsers)
+      .catch((err) => console.error("getAllUsers error:", err))
+      .finally(() => setLoading(false));
   };
-  useEffect(load, []);
+
+  // Re-run whenever userProfile changes (i.e. when Firestore sync completes)
+  useEffect(() => {
+    if (userProfile) load();
+  }, [userProfile?.uid]);
 
   const toggleRole = async (u: UserProfile) => {
     if (u.uid === currentUser?.uid) {

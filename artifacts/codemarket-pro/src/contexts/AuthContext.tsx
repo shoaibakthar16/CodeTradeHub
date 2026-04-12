@@ -38,10 +38,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(firebaseUser);
       if (firebaseUser) {
         try {
-          const profile = await getUserProfile(firebaseUser.uid);
+          const isAdminEmail = ADMIN_EMAILS.includes((firebaseUser.email || "").toLowerCase());
+          let profile = await getUserProfile(firebaseUser.uid).catch(() => null);
+
+          // Always sync admin emails to ensure role: "admin" is in Firestore
+          // Also sync if profile is missing entirely
+          if (isAdminEmail || !profile) {
+            await createOrUpdateUserProfile({
+              uid: firebaseUser.uid,
+              email: firebaseUser.email!,
+              displayName: firebaseUser.displayName || profile?.displayName || "User",
+              photoURL: firebaseUser.photoURL || undefined,
+              role: isAdminEmail ? "admin" : "user",
+            }).catch(() => null);
+            profile = await getUserProfile(firebaseUser.uid).catch(() => null);
+          }
+
           setUserProfile(profile);
         } catch {
-          // Firestore rules may not be set up yet — fall back gracefully
           setUserProfile(null);
         }
       } else {

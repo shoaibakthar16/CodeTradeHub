@@ -8,7 +8,6 @@ import {
   deleteDoc,
   query,
   where,
-  orderBy,
   limit,
   Timestamp,
   serverTimestamp,
@@ -21,6 +20,12 @@ function toDate(val: unknown): Date | string {
   if (val instanceof Timestamp) return val.toDate();
   if (val instanceof Date) return val;
   return val as string;
+}
+
+function sortByDate(a: Date | string, b: Date | string): number {
+  const da = a instanceof Date ? a : new Date(a || 0);
+  const db2 = b instanceof Date ? b : new Date(b || 0);
+  return db2.getTime() - da.getTime();
 }
 
 function docToProduct(id: string, data: Record<string, unknown>): Product {
@@ -131,29 +136,28 @@ export async function createOrder(data: Omit<Order, "id" | "createdAt" | "update
 }
 
 export async function getOrdersByUser(userId: string): Promise<Order[]> {
-  const q = query(
-    collection(db, "orders"),
-    where("userId", "==", userId),
-    orderBy("createdAt", "desc")
-  );
+  const q = query(collection(db, "orders"), where("userId", "==", userId));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({
-    ...(d.data() as Omit<Order, "id" | "createdAt" | "updatedAt">),
-    id: d.id,
-    createdAt: toDate(d.data().createdAt),
-    updatedAt: toDate(d.data().updatedAt),
-  }));
+  return snap.docs
+    .map((d) => ({
+      ...(d.data() as Omit<Order, "id" | "createdAt" | "updatedAt">),
+      id: d.id,
+      createdAt: toDate(d.data().createdAt),
+      updatedAt: toDate(d.data().updatedAt),
+    }))
+    .sort((a, b) => sortByDate(a.createdAt, b.createdAt));
 }
 
 export async function getAllOrders(): Promise<Order[]> {
-  const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({
-    ...(d.data() as Omit<Order, "id" | "createdAt" | "updatedAt">),
-    id: d.id,
-    createdAt: toDate(d.data().createdAt),
-    updatedAt: toDate(d.data().updatedAt),
-  }));
+  const snap = await getDocs(collection(db, "orders"));
+  return snap.docs
+    .map((d) => ({
+      ...(d.data() as Omit<Order, "id" | "createdAt" | "updatedAt">),
+      id: d.id,
+      createdAt: toDate(d.data().createdAt),
+      updatedAt: toDate(d.data().updatedAt),
+    }))
+    .sort((a, b) => sortByDate(a.createdAt, b.createdAt));
 }
 
 export async function updateOrderStatus(id: string, status: Order["status"]): Promise<void> {
@@ -200,12 +204,13 @@ export async function createOrUpdateUserProfile(profile: Omit<UserProfile, "crea
 }
 
 export async function getAllUsers(): Promise<UserProfile[]> {
-  const q = query(collection(db, "users"), orderBy("createdAt", "desc"));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({
-    ...(d.data() as Omit<UserProfile, "createdAt">),
-    createdAt: toDate(d.data().createdAt),
-  }));
+  const snap = await getDocs(collection(db, "users"));
+  return snap.docs
+    .map((d) => ({
+      ...(d.data() as Omit<UserProfile, "createdAt">),
+      createdAt: toDate(d.data().createdAt),
+    }))
+    .sort((a, b) => sortByDate(a.createdAt, b.createdAt));
 }
 
 export async function setUserRole(uid: string, role: "user" | "admin"): Promise<void> {
@@ -217,25 +222,27 @@ export async function getReviewsByProduct(productId: string): Promise<Review[]> 
   const q = query(
     collection(db, "reviews"),
     where("productId", "==", productId),
-    where("approved", "==", true),
-    orderBy("createdAt", "desc")
+    where("approved", "==", true)
   );
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({
-    ...(d.data() as Omit<Review, "id" | "createdAt">),
-    id: d.id,
-    createdAt: toDate(d.data().createdAt),
-  }));
+  return snap.docs
+    .map((d) => ({
+      ...(d.data() as Omit<Review, "id" | "createdAt">),
+      id: d.id,
+      createdAt: toDate(d.data().createdAt),
+    }))
+    .sort((a, b) => sortByDate(a.createdAt, b.createdAt));
 }
 
 export async function getAllReviews(): Promise<Review[]> {
-  const q = query(collection(db, "reviews"), orderBy("createdAt", "desc"));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({
-    ...(d.data() as Omit<Review, "id" | "createdAt">),
-    id: d.id,
-    createdAt: toDate(d.data().createdAt),
-  }));
+  const snap = await getDocs(collection(db, "reviews"));
+  return snap.docs
+    .map((d) => ({
+      ...(d.data() as Omit<Review, "id" | "createdAt">),
+      id: d.id,
+      createdAt: toDate(d.data().createdAt),
+    }))
+    .sort((a, b) => sortByDate(a.createdAt, b.createdAt));
 }
 
 export async function createReview(data: Omit<Review, "id" | "createdAt">): Promise<string> {
@@ -275,14 +282,15 @@ export async function getCouponByCode(code: string): Promise<Coupon | null> {
 }
 
 export async function getAllCoupons(): Promise<Coupon[]> {
-  const q = query(collection(db, "coupons"), orderBy("createdAt", "desc"));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({
-    ...(d.data() as Omit<Coupon, "id" | "createdAt" | "expiresAt">),
-    id: d.id,
-    createdAt: toDate(d.data().createdAt),
-    expiresAt: toDate(d.data().expiresAt),
-  }));
+  const snap = await getDocs(collection(db, "coupons"));
+  return snap.docs
+    .map((d) => ({
+      ...(d.data() as Omit<Coupon, "id" | "createdAt" | "expiresAt">),
+      id: d.id,
+      createdAt: toDate(d.data().createdAt),
+      expiresAt: toDate(d.data().expiresAt),
+    }))
+    .sort((a, b) => sortByDate(a.createdAt, b.createdAt));
 }
 
 export async function createCoupon(data: Omit<Coupon, "id" | "createdAt">): Promise<string> {
@@ -311,26 +319,28 @@ export async function getDashboardStats(): Promise<{
 }> {
   const [productsSnap, ordersSnap, usersSnap] = await Promise.all([
     getDocs(collection(db, "products")),
-    getDocs(query(collection(db, "orders"), orderBy("createdAt", "desc"), limit(10))),
+    getDocs(collection(db, "orders")),
     getDocs(collection(db, "users")),
   ]);
 
-  const allOrdersSnap = await getDocs(collection(db, "orders"));
-  const allOrders = allOrdersSnap.docs.map((d) => d.data() as Order);
+  const allOrders = ordersSnap.docs.map((d) => d.data() as Order);
   const totalRevenue = allOrders
     .filter((o) => o.status === "paid")
     .reduce((sum, o) => sum + (o.total || 0), 0);
 
-  const recentOrders = ordersSnap.docs.map((d) => ({
-    ...(d.data() as Omit<Order, "id" | "createdAt" | "updatedAt">),
-    id: d.id,
-    createdAt: toDate(d.data().createdAt),
-    updatedAt: toDate(d.data().updatedAt),
-  }));
+  const recentOrders = ordersSnap.docs
+    .map((d) => ({
+      ...(d.data() as Omit<Order, "id" | "createdAt" | "updatedAt">),
+      id: d.id,
+      createdAt: toDate(d.data().createdAt),
+      updatedAt: toDate(d.data().updatedAt),
+    }))
+    .sort((a, b) => sortByDate(a.createdAt, b.createdAt))
+    .slice(0, 10);
 
   return {
     totalProducts: productsSnap.size,
-    totalOrders: allOrdersSnap.size,
+    totalOrders: ordersSnap.size,
     totalRevenue,
     totalUsers: usersSnap.size,
     recentOrders,

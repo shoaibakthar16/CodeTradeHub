@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { formatPrice } from "@/lib/stripe";
+import { trackEvent } from "@/lib/analytics";
 import type { Product } from "@/types";
 
 interface ProductCardProps {
@@ -21,6 +22,18 @@ export default function ProductCard({ product }: ProductCardProps) {
   const discountPct = hasDiscount
     ? Math.round(((product.originalPrice! - product.price) / product.originalPrice!) * 100)
     : 0;
+
+  const handleAddToCart = () => {
+    if (inCart) return;
+    addItem(product);
+    trackEvent("add_to_cart", {
+      source: "product_card",
+      productId: product.id,
+      slug: product.slug,
+      price: product.price,
+      category: product.category,
+    });
+  };
 
   return (
     <Card
@@ -133,7 +146,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <Button
             size="sm"
             variant={inCart ? "secondary" : "default"}
-            onClick={() => !inCart && addItem(product)}
+            onClick={handleAddToCart}
             className="h-7 w-7 sm:h-8 sm:w-auto sm:px-3 p-0 sm:gap-1.5 text-xs"
             data-testid={`button-add-cart-${product.id}`}
             aria-label={inCart ? "Added to cart" : "Add to cart"}

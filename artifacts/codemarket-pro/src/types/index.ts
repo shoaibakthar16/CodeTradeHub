@@ -13,6 +13,7 @@ export interface Product {
   category: string;
   tags: string[];
   demoUrl?: string;
+  previewVideoUrl?: string;
   docsUrl?: string;
   version: string;
   fileUrl?: string;
@@ -32,7 +33,7 @@ export interface Order {
   products: OrderItem[];
   total: number;
   status: "pending" | "paid" | "cancelled";
-  paymentMethod: "stripe" | "whatsapp";
+  paymentMethod: "stripe" | "paypal" | "whatsapp";
   stripeSessionId?: string;
   couponCode?: string;
   discountAmount?: number;

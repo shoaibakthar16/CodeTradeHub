@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 
 const ALL_CATEGORIES = [
@@ -62,14 +63,17 @@ export default function Navbar() {
     <nav
       className={`sticky top-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-[hsl(230_15%_7%/0.97)] shadow-[0_8px_32px_rgba(0,0,0,0.4)] border-b border-white/8"
-          : "bg-[hsl(230_15%_7%/0.85)] border-b border-white/5"
+          ? "bg-background/95 shadow-[0_8px_24px_hsl(var(--foreground)/0.08)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] border-b border-border/80"
+          : "bg-background/85 border-b border-border/60"
       } backdrop-blur-xl`}
     >
       {/* Top accent line */}
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary to-cyan-400 opacity-80" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/55 to-cyan-500/55 opacity-70 dark:opacity-75" />
       {/* Bottom glow */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/35 to-transparent dark:via-primary/30" />
+      {/* Side glow */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-12 bg-gradient-to-r from-primary/6 to-transparent dark:from-primary/8" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-cyan-500/6 to-transparent dark:from-cyan-500/8" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-[66px]">
@@ -77,16 +81,16 @@ export default function Navbar() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2.5 group shrink-0">
             <div className="relative">
-              <div className="absolute inset-0 rounded-xl bg-primary/30 blur-md group-hover:bg-primary/50 transition-all duration-300" />
+              <div className="absolute inset-0 rounded-xl bg-primary/18 dark:bg-primary/24 blur-sm group-hover:bg-primary/28 dark:group-hover:bg-primary/38 transition-all duration-300" />
               <img
                 src="/logo.png"
                 alt="CodeTradeHub"
-                className="relative w-9 h-9 rounded-xl object-cover ring-1 ring-white/10 group-hover:ring-primary/50 transition-all duration-300"
+                className="relative w-9 h-9 rounded-xl object-cover ring-1 ring-border/80 dark:ring-white/10 group-hover:ring-primary/50 transition-all duration-300"
               />
             </div>
             <div className="flex flex-col leading-none">
-              <span className="font-extrabold text-[17px] tracking-tight">
-                <span className="text-white">Code</span>
+                <span className="font-extrabold text-[17px] tracking-tight">
+                <span className="text-foreground">Code</span>
                 <span className="bg-gradient-to-r from-primary to-cyan-400 bg-clip-text text-transparent">TradeHub</span>
               </span>
               <span className="text-[10px] text-muted-foreground/70 tracking-widest uppercase font-medium hidden sm:block">
@@ -103,8 +107,8 @@ export default function Navbar() {
                 href={href}
                 className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 group ${
                   isActive(href)
-                    ? "text-white"
-                    : "text-muted-foreground hover:text-white"
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <span className="relative">{label}</span>
@@ -120,18 +124,18 @@ export default function Navbar() {
               onMouseEnter={() => setAllCatOpen(true)}
               onMouseLeave={() => setAllCatOpen(false)}
             >
-              <button className="flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-white hover:bg-white/5 transition-all duration-200">
+              <button className="flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-all duration-200">
                 Category <ChevronDown className={`w-3.5 h-3.5 mt-px transition-transform duration-200 ${allCatOpen ? "rotate-180" : ""}`} />
               </button>
               {allCatOpen && (
-                <div className="absolute top-full left-0 mt-1 w-[420px] rounded-xl border border-white/10 bg-[hsl(230_15%_10%)] shadow-2xl z-50 p-3">
+                <div className="absolute top-full left-0 mt-1 w-[420px] rounded-xl border border-border bg-popover shadow-2xl z-50 p-3">
                   <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50 px-2 pb-2">Browse by Category</p>
                   <div className="grid grid-cols-2 gap-0.5">
                     {ALL_CATEGORIES.map(({ label, slug, icon: Icon, color }) => (
                       <Link
                         key={slug}
                         href={`/products?category=${slug}`}
-                        className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors group"
+                        className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors group"
                         onClick={() => setAllCatOpen(false)}
                       >
                         <Icon className={`w-4 h-4 shrink-0 ${color}`} />
@@ -139,10 +143,10 @@ export default function Navbar() {
                       </Link>
                     ))}
                   </div>
-                  <div className="mt-2 pt-2 border-t border-white/8">
+                  <div className="mt-2 pt-2 border-t border-border">
                     <Link
                       href="/products"
-                      className="flex items-center justify-center gap-2 py-2 text-xs font-semibold text-primary hover:text-white transition-colors"
+                      className="flex items-center justify-center gap-2 py-2 text-xs font-semibold text-primary hover:text-foreground transition-colors"
                       onClick={() => setAllCatOpen(false)}
                     >
                       View all products →
@@ -158,28 +162,28 @@ export default function Navbar() {
               onMouseEnter={() => setCatOpen(true)}
               onMouseLeave={() => setCatOpen(false)}
             >
-              <button className="flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-white hover:bg-white/5 transition-all duration-200">
+              <button className="flex items-center gap-1 px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-all duration-200">
                 Templates <ChevronDown className={`w-3.5 h-3.5 mt-px transition-transform duration-200 ${catOpen ? "rotate-180" : ""}`} />
               </button>
               {catOpen && (
-                <div className="absolute top-full left-0 mt-1 w-52 rounded-lg border border-white/10 bg-[hsl(230_15%_10%)] shadow-2xl py-1 z-50">
+                <div className="absolute top-full left-0 mt-1 w-52 rounded-lg border border-border bg-popover shadow-2xl py-1 z-50">
                   <Link
                     href="/products?category=wordpress"
-                    className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
+                    className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors"
                     onClick={() => setCatOpen(false)}
                   >
                     <Globe className="w-4 h-4 text-blue-400/80 shrink-0" /> WordPress Templates
                   </Link>
                   <Link
                     href="/products?category=shopify"
-                    className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
+                    className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors"
                     onClick={() => setCatOpen(false)}
                   >
                     <ShoppingBag className="w-4 h-4 text-green-400/80 shrink-0" /> Shopify Templates
                   </Link>
                   <Link
                     href="/products?category=blogger"
-                    className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-muted-foreground hover:text-white hover:bg-white/5 transition-colors"
+                    className="flex items-center gap-2.5 px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors"
                     onClick={() => setCatOpen(false)}
                   >
                     <BookOpen className="w-4 h-4 text-orange-400/80 shrink-0" /> Blogger Templates
@@ -193,8 +197,8 @@ export default function Navbar() {
                 href="/admin"
                 className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                   location.startsWith("/admin")
-                    ? "text-white"
-                    : "text-muted-foreground hover:text-white"
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <span className="relative flex items-center gap-1.5">
@@ -209,13 +213,14 @@ export default function Navbar() {
 
           {/* Right side */}
           <div className="flex items-center gap-1.5">
+            <ThemeToggle />
 
             {/* Cart */}
             <Button
               variant="ghost"
               size="icon"
               asChild
-              className="relative w-9 h-9 rounded-lg hover:bg-white/8 transition-all"
+              className="relative w-9 h-9 rounded-lg hover:bg-muted/70 transition-all"
               data-testid="button-cart"
             >
               <Link href="/cart">
@@ -233,7 +238,7 @@ export default function Navbar() {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
-                    className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-xl hover:bg-white/6 border border-transparent hover:border-white/10 transition-all duration-200"
+                    className="flex items-center gap-2 pl-1 pr-2.5 py-1 rounded-xl hover:bg-muted/70 border border-transparent hover:border-border transition-all duration-200"
                     data-testid="button-user-menu"
                   >
                     <Avatar className="w-7 h-7">
@@ -247,10 +252,10 @@ export default function Navbar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  className="w-52 bg-[hsl(230_15%_10%)] border-white/10 shadow-2xl"
+                  className="w-52 bg-popover border-border shadow-2xl"
                 >
-                  <div className="px-3 py-2.5 border-b border-white/8">
-                    <p className="text-sm font-semibold truncate text-white">{user.displayName || "User"}</p>
+                  <div className="px-3 py-2.5 border-b border-border">
+                    <p className="text-sm font-semibold truncate text-foreground">{user.displayName || "User"}</p>
                     <p className="text-xs text-muted-foreground truncate mt-0.5">{user.email}</p>
                   </div>
                   <div className="py-1">
@@ -269,7 +274,7 @@ export default function Navbar() {
                       </DropdownMenuItem>
                     )}
                   </div>
-                  <DropdownMenuSeparator className="bg-white/8" />
+                  <DropdownMenuSeparator className="bg-border" />
                   <DropdownMenuItem
                     onClick={handleLogout}
                     className="flex items-center gap-2.5 cursor-pointer text-red-400 hover:text-red-300 focus:text-red-300"
@@ -296,7 +301,7 @@ export default function Navbar() {
 
             {/* Mobile toggle */}
             <button
-              className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg hover:bg-white/8 transition-colors ml-1"
+              className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg hover:bg-muted/70 transition-colors ml-1"
               onClick={() => setMobileOpen(!mobileOpen)}
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -306,50 +311,50 @@ export default function Navbar() {
 
         {/* Mobile Nav */}
         {mobileOpen && (
-          <div className="md:hidden border-t border-white/8 py-3 space-y-0.5 pb-4">
+          <div className="md:hidden border-t border-border py-3 space-y-0.5 pb-4">
             <Link
               href="/"
-              className={`flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg transition-colors ${isActive("/") ? "bg-white/8 text-white font-medium" : "text-muted-foreground hover:bg-white/5 hover:text-white"}`}
+              className={`flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg transition-colors ${isActive("/") ? "bg-muted text-foreground font-medium" : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"}`}
               onClick={() => setMobileOpen(false)}
             >
               <Home className="w-4 h-4" /> Home
             </Link>
             <Link
               href="/products"
-              className={`flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg transition-colors ${isActive("/products") ? "bg-white/8 text-white font-medium" : "text-muted-foreground hover:bg-white/5 hover:text-white"}`}
+              className={`flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg transition-colors ${isActive("/products") ? "bg-muted text-foreground font-medium" : "text-muted-foreground hover:bg-muted/70 hover:text-foreground"}`}
               onClick={() => setMobileOpen(false)}
             >
               <Zap className="w-4 h-4" /> Products
             </Link>
-            <div className="h-px bg-white/8 mx-1 my-1.5" />
+            <div className="h-px bg-border mx-1 my-1.5" />
             <p className="px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">Browse by Category</p>
             {ALL_CATEGORIES.map(({ label, slug, icon: Icon, color }) => (
               <Link
                 key={slug}
                 href={`/products?category=${slug}`}
-                className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-white/5 hover:text-white transition-colors"
+                className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-colors"
                 onClick={() => setMobileOpen(false)}
               >
                 <Icon className={`w-4 h-4 shrink-0 ${color}`} /> {label}
               </Link>
             ))}
-            <div className="h-px bg-white/8 mx-1 my-1.5" />
+            <div className="h-px bg-border mx-1 my-1.5" />
             <p className="px-3 py-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">Templates</p>
-            <Link href="/products?category=wordpress" className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-white/5 hover:text-white transition-colors" onClick={() => setMobileOpen(false)}>
+            <Link href="/products?category=wordpress" className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-colors" onClick={() => setMobileOpen(false)}>
               <Globe className="w-4 h-4 text-blue-400/80" /> WordPress Templates
             </Link>
-            <Link href="/products?category=shopify" className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-white/5 hover:text-white transition-colors" onClick={() => setMobileOpen(false)}>
+            <Link href="/products?category=shopify" className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-colors" onClick={() => setMobileOpen(false)}>
               <ShoppingBag className="w-4 h-4 text-green-400/80" /> Shopify Templates
             </Link>
-            <Link href="/products?category=blogger" className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-white/5 hover:text-white transition-colors" onClick={() => setMobileOpen(false)}>
+            <Link href="/products?category=blogger" className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-colors" onClick={() => setMobileOpen(false)}>
               <BookOpen className="w-4 h-4 text-orange-400/80" /> Blogger Templates
             </Link>
             {user && (
               <>
-                <div className="h-px bg-white/8 mx-1 my-2" />
+                <div className="h-px bg-border mx-1 my-2" />
                 <Link
                   href="/dashboard"
-                  className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-white/5 hover:text-white transition-colors"
+                  className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-colors"
                   onClick={() => setMobileOpen(false)}
                 >
                   <LayoutDashboard className="w-4 h-4 text-primary/60" /> Dashboard
@@ -359,7 +364,7 @@ export default function Navbar() {
             {isAdmin && (
               <Link
                 href="/admin"
-                className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-white/5 hover:text-white transition-colors"
+                className="flex items-center gap-2.5 px-3 py-2.5 text-sm rounded-lg text-muted-foreground hover:bg-muted/70 hover:text-foreground transition-colors"
                 onClick={() => setMobileOpen(false)}
               >
                 <Shield className="w-4 h-4 text-primary/60" /> Admin Panel

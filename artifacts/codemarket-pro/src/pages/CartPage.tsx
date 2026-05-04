@@ -12,6 +12,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { getCouponByCode } from "@/lib/firestore";
 import { formatPrice } from "@/lib/stripe";
+import { trackEvent } from "@/lib/analytics";
 
 export default function CartPage() {
   const { items, removeItem, subtotal, total, discountAmount, couponCode, setCoupon, clearCoupon } = useCart();
@@ -48,6 +49,12 @@ export default function CartPage() {
   };
 
   const handleCheckout = () => {
+    trackEvent("checkout_click", {
+      source: "cart",
+      itemCount: items.length,
+      total,
+      loggedIn: Boolean(user),
+    });
     if (!user) {
       setLocation("/login");
       return;
@@ -198,6 +205,7 @@ export default function CartPage() {
                     href={paypalCartUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trackEvent("paypal_click", { source: "cart", itemCount: items.length, total })}
                     className="w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all bg-[#FFC439] hover:bg-[#f0b429] text-[#003087] border border-[#FFC439] hover:shadow-md"
                     data-testid="button-paypal-cart"
                   >

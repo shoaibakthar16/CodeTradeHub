@@ -32,7 +32,7 @@ const LEGAL_LINKS = [
 const SOCIAL_LINKS = [
   { icon: MessageCircle, href: `https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER}`, label: "WhatsApp", color: "hover:text-green-400 hover:border-green-500/40 hover:bg-green-500/5" },
   { icon: Mail, href: "mailto:support@codetradehub.com", label: "Email", color: "hover:text-primary hover:border-primary/40 hover:bg-primary/5" },
-  { icon: Github, href: "#", label: "GitHub", color: "hover:text-foreground hover:border-white/20 hover:bg-white/5" },
+  { icon: Github, href: "#", label: "GitHub", color: "hover:text-foreground hover:border-border hover:bg-muted/70" },
   { icon: Twitter, href: "#", label: "Twitter", color: "hover:text-sky-400 hover:border-sky-500/40 hover:bg-sky-500/5" },
 ];
 
@@ -49,10 +49,10 @@ export default function Footer() {
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
 
       {/* Main footer body */}
-      <div className="bg-[hsl(230_15%_5%)] border-t border-white/5">
+      <div className="bg-card/75 border-t border-border/80">
 
         {/* ── CTA strip ── */}
-        <div className="border-b border-white/5">
+        <div className="border-b border-border/70">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-5">
             <div className="text-center sm:text-left">
               <p className="text-sm font-semibold text-foreground">Ready to launch your next project?</p>
@@ -109,7 +109,7 @@ export default function Footer() {
                     target={href.startsWith("http") ? "_blank" : undefined}
                     rel="noopener noreferrer"
                     aria-label={label}
-                    className={`w-9 h-9 rounded-xl border border-white/8 flex items-center justify-center text-muted-foreground transition-all ${color}`}
+                    className={`w-9 h-9 rounded-xl border border-border/80 flex items-center justify-center text-muted-foreground transition-all ${color}`}
                   >
                     <Icon className="w-4 h-4" />
                   </a>
@@ -167,7 +167,7 @@ export default function Footer() {
         </div>
 
         {/* ── Bottom bar ── */}
-        <div className="border-t border-white/5">
+        <div className="border-t border-border/70">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
 
             {/* Copyright */}

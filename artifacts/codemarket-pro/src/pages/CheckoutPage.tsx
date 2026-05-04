@@ -12,6 +12,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { createOrder } from "@/lib/firestore";
 import { formatPrice } from "@/lib/stripe";
+import { trackEvent } from "@/lib/analytics";
 
 const STEPS = [
   { label: "Validating order", duration: 700 },
@@ -138,8 +139,13 @@ export default function CheckoutPage() {
     `Hi! I'd like to purchase:\n${items.map((i) => `- ${i.product.title} ($${i.product.price})`).join("\n")}\n\nTotal: $${total.toFixed(2)}`
   );
   const whatsappUrl = `https://wa.me/${import.meta.env.VITE_WHATSAPP_NUMBER}?text=${whatsappMsg}`;
+  const paypalEmail = import.meta.env.VITE_PAYPAL_EMAIL;
+  const paypalCheckoutUrl = paypalEmail
+    ? `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${encodeURIComponent(paypalEmail)}&item_name=${encodeURIComponent(`CodeTradeHub Order (${items.length} item${items.length > 1 ? "s" : ""})`)}&amount=${total.toFixed(2)}&currency_code=USD&no_shipping=1`
+    : null;
 
   const handleStripeCheckout = async () => {
+    trackEvent("checkout_pay_click", { method: "stripe", source: "checkout", total, itemCount: items.length });
     setPaying(true);
     try {
       const orderData: Parameters<typeof createOrder>[0] = {
@@ -177,6 +183,7 @@ export default function CheckoutPage() {
   };
 
   const handleWhatsApp = async () => {
+    trackEvent("whatsapp_click", { source: "checkout", total, itemCount: items.length });
     try {
       const waOrderData: Parameters<typeof createOrder>[0] = {
         userId: user.uid,
@@ -200,6 +207,46 @@ export default function CheckoutPage() {
       toast({ title: "WhatsApp opened", description: "Your order has been saved. Complete payment via WhatsApp." });
     } catch {
       window.open(whatsappUrl, "_blank");
+    }
+  };
+
+  const handlePayPal = async () => {
+    trackEvent("paypal_click", { source: "checkout", total, itemCount: items.length });
+    if (!paypalCheckoutUrl) {
+      toast({
+        title: "PayPal not configured",
+        description: "Set VITE_PAYPAL_EMAIL to show PayPal checkout.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      const paypalOrderData: Parameters<typeof createOrder>[0] = {
+        userId: user.uid,
+        userEmail: user.email!,
+        userName: user.displayName || "User",
+        products: items.map((i) => ({
+          productId: i.product.id,
+          productTitle: i.product.title,
+          productSlug: i.product.slug,
+          price: i.product.price,
+          thumbnail: i.product.thumbnail || "",
+        })),
+        total,
+        status: "pending",
+        paymentMethod: "paypal",
+      };
+      if (couponCode) paypalOrderData.couponCode = couponCode;
+      if (discountAmount) paypalOrderData.discountAmount = discountAmount;
+      await createOrder(paypalOrderData);
+      window.open(paypalCheckoutUrl, "_blank");
+      toast({
+        title: "PayPal opened",
+        description: "Your order has been saved as pending. We'll confirm once payment is received.",
+      });
+    } catch {
+      window.open(paypalCheckoutUrl, "_blank");
     }
   };
 
@@ -300,6 +347,34 @@ export default function CheckoutPage() {
                   </Button>
                 </CardContent>
               </Card>
+
+              {/* PayPal */}
+              {paypalCheckoutUrl && (
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <span className="inline-flex items-center justify-center w-4 h-4 rounded-sm bg-[#003087] text-[9px] font-bold text-white">
+                        P
+                      </span>
+                      Pay with PayPal
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Complete payment on PayPal in a secure pop-up tab. Your order will be saved as pending until payment confirmation.
+                    </p>
+                    <Button
+                      variant="outline"
+                      className="w-full gap-2 border-[#FFC439]/70 bg-[#FFC439] text-[#003087] hover:bg-[#f0b429] hover:text-[#003087]"
+                      onClick={handlePayPal}
+                      data-testid="button-paypal-checkout"
+                    >
+                      <span className="font-semibold">PayPal</span>
+                      Checkout
+                    </Button>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             {/* Order summary */}

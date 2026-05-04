@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useParams } from "wouter";
 import {
   ExternalLink, Star, ShoppingCart, Check, MessageCircle, ChevronLeft,
-  Code2, Download, FileCode, BookOpen, Shield, Zap
+  Code2, Download, FileCode, BookOpen, Shield, Zap, ShieldCheck, Receipt, BadgeCheck, PlayCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,10 +13,12 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { getProductBySlug, getReviewsByProduct, createReview } from "@/lib/firestore";
+import ProductCard from "@/components/store/ProductCard";
+import { getProductBySlug, getReviewsByProduct, createReview, getProducts } from "@/lib/firestore";
 import { formatPrice } from "@/lib/stripe";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { trackEvent } from "@/lib/analytics";
 import type { Product, Review } from "@/types";
 
 export default function ProductDetailPage() {
@@ -29,6 +31,7 @@ export default function ProductDetailPage() {
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState("");
   const [submittingReview, setSubmittingReview] = useState(false);
@@ -43,6 +46,14 @@ export default function ProductDetailPage() {
         setProduct(p);
         if (p) {
           getReviewsByProduct(p.id).then(setReviews);
+          getProducts({ publishedOnly: true }).then((all) => {
+            const related = all
+              .filter((item) => item.id !== p.id && item.category === p.category)
+              .slice(0, 4);
+            setRelatedProducts(related);
+          });
+        } else {
+          setRelatedProducts([]);
         }
       })
       .finally(() => setLoading(false));
@@ -127,6 +138,34 @@ export default function ProductDetailPage() {
   const paypalBuyNowUrl = paypalEmail
     ? `https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=${encodeURIComponent(paypalEmail)}&item_name=${encodeURIComponent(product.title)}&amount=${product.price.toFixed(2)}&currency_code=USD&no_shipping=1`
     : null;
+  const totalSales = Math.max(product.downloadCount || 0, reviews.length * 2);
+
+  const rawVideoUrl = product.previewVideoUrl || product.demoUrl || "";
+  const youtubeMatch = rawVideoUrl.match(
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{6,})/,
+  );
+  const vimeoMatch = rawVideoUrl.match(/vimeo\.com\/(\d+)/);
+  const isDirectVideo =
+    /\.(mp4|webm|ogg)$/i.test(rawVideoUrl) || rawVideoUrl.includes("firebasestorage");
+  const embedVideoUrl = youtubeMatch
+    ? `https://www.youtube.com/embed/${youtubeMatch[1]}?autoplay=0&mute=1&rel=0`
+    : vimeoMatch
+      ? `https://player.vimeo.com/video/${vimeoMatch[1]}`
+      : null;
+  const iframePreviewUrl =
+    embedVideoUrl || (!isDirectVideo && rawVideoUrl.startsWith("http") ? rawVideoUrl : null);
+
+  const handleAddToCart = () => {
+    if (inCart) return;
+    addItem(product);
+    trackEvent("add_to_cart", {
+      source: "product_detail",
+      productId: product.id,
+      slug: product.slug,
+      price: product.price,
+      category: product.category,
+    });
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -169,6 +208,35 @@ export default function ProductDetailPage() {
                 </div>
               )}
             </div>
+
+            {/* Product video preview */}
+            {(isDirectVideo || iframePreviewUrl) && (
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-2">
+                  <PlayCircle className="w-4 h-4 text-primary" />
+                  <h2 className="text-sm font-semibold">10-20s Product Preview</h2>
+                </div>
+                <div className="aspect-video rounded-xl overflow-hidden border border-border bg-black/5">
+                  {isDirectVideo ? (
+                    <video
+                      src={rawVideoUrl}
+                      controls
+                      muted
+                      preload="metadata"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <iframe
+                      src={iframePreviewUrl || undefined}
+                      title={`${product.title} preview`}
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      className="w-full h-full border-0"
+                    />
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Info */}
             <div className="mb-6">
@@ -236,6 +304,9 @@ export default function ProductDetailPage() {
                           {r.userName[0]}
                         </div>
                         <span className="text-sm font-medium">{r.userName}</span>
+                        <Badge variant="secondary" className="text-[10px] h-5 px-1.5 gap-1">
+                          <BadgeCheck className="w-3 h-3" /> Verified
+                        </Badge>
                         <div className="flex ml-auto">
                           {Array.from({ length: 5 }).map((_, i) => (
                             <Star key={i} className={`w-3.5 h-3.5 ${i < r.rating ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground/30"}`} />
@@ -293,10 +364,25 @@ export default function ProductDetailPage() {
                 </div>
                 <p className="text-xs text-muted-foreground mb-4">One-time payment. Lifetime access.</p>
 
+                <div className="grid grid-cols-3 gap-2 mb-4">
+                  <div className="rounded-md border border-border bg-muted/40 px-2 py-2 text-center">
+                    <ShieldCheck className="w-3.5 h-3.5 text-primary mx-auto mb-1" />
+                    <p className="text-[10px] font-medium">Secure Payment</p>
+                  </div>
+                  <div className="rounded-md border border-border bg-muted/40 px-2 py-2 text-center">
+                    <Zap className="w-3.5 h-3.5 text-primary mx-auto mb-1" />
+                    <p className="text-[10px] font-medium">Instant Download</p>
+                  </div>
+                  <div className="rounded-md border border-border bg-muted/40 px-2 py-2 text-center">
+                    <Receipt className="w-3.5 h-3.5 text-primary mx-auto mb-1" />
+                    <p className="text-[10px] font-medium">Refund Policy</p>
+                  </div>
+                </div>
+
                 <Button
                   className="w-full mb-2 gap-2"
                   size="lg"
-                  onClick={() => !inCart && addItem(product)}
+                  onClick={handleAddToCart}
                   variant={inCart ? "secondary" : "default"}
                   data-testid="button-add-to-cart"
                 >
@@ -314,6 +400,7 @@ export default function ProductDetailPage() {
                     href={paypalBuyNowUrl}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() => trackEvent("paypal_click", { source: "product_detail", productId: product.id, slug: product.slug, price: product.price })}
                     className="mb-2 w-full flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all bg-[#FFC439] hover:bg-[#f0b429] text-[#003087] border border-[#FFC439] hover:shadow-md"
                     data-testid="button-paypal"
                   >
@@ -335,7 +422,12 @@ export default function ProductDetailPage() {
                   asChild
                   data-testid="button-whatsapp"
                 >
-                  <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
+                  <a
+                    href={whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={() => trackEvent("whatsapp_click", { source: "product_detail", productId: product.id, slug: product.slug, price: product.price })}
+                  >
                     <MessageCircle className="w-4 h-4" />
                     Buy via WhatsApp
                   </a>
@@ -366,6 +458,9 @@ export default function ProductDetailPage() {
                     <Download className="w-4 h-4" /> {product.downloadCount || 0} downloads
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <BadgeCheck className="w-4 h-4" /> {totalSales}+ total sales
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <FileCode className="w-4 h-4" /> Version {product.version}
                   </div>
                 </div>
@@ -385,6 +480,22 @@ export default function ProductDetailPage() {
             </div>
           </div>
         </div>
+
+        {relatedProducts.length > 0 && (
+          <section className="mt-12">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold">Related Products</h2>
+              <Link href={`/products?category=${product.category}`} className="text-sm text-primary hover:underline">
+                View more
+              </Link>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              {relatedProducts.map((item) => (
+                <ProductCard key={item.id} product={item} />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
       <Footer />
     </div>
